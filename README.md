@@ -13,7 +13,7 @@ You will be able to manage your in-app payments in the most efficient way with a
 
 ![in-app-payments ANE](http://www.myflashlabs.com/wp-content/uploads/2015/12/product_adobe-air-ane-in-app-payments-595x738.jpg)
 
-# USAGE - Location:
+# AS3 USAGE:
 ```actionscript
 	import com.myflashlab.air.extensions.billing.Billing;
 	import com.myflashlab.air.extensions.billing.BillingType;
