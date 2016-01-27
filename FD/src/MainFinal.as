@@ -77,7 +77,7 @@ package
 			_txt.multiline = true;
 			_txt.wordWrap = true;
 			_txt.embedFonts = false;
-			_txt.htmlText = "<font face='Arimo' color='#333333' size='20'><b>Identical (iOS+Android) in-app-payments ANE BETA V"+Billing.VERSION+"</b></font>";
+			_txt.htmlText = "<font face='Arimo' color='#333333' size='20'><b>Identical (iOS+Android) in-app-payments ANE V"+Billing.VERSION+"</b></font>";
 			_txt.scaleX = _txt.scaleY = DeviceInfo.dpiScaleMultiplier;
 			this.addChild(_txt);
 			
@@ -185,7 +185,7 @@ package
 		private function onInitResult($status:int, $msg:String):void
 		{
 			/**
-			 * 	When developing your app, you may need to consume an already owned item. This method is for for test reasons on Android only.
+			 * 	When developing your app, you may need to consume an already owned item. This method is for for test reasons on Android ONLY.
 			 * 	You should NOT use this method in production. So, if you need to consume a permenant product consume it like this and the ANE 
 			 * 	will allow you to purchase the same item again. I am sure you will need this soon or later, when developing :) So, cheers.
 			 * 
@@ -198,7 +198,7 @@ package
 			 * 	// pass in your product id for which you wish to consume
 			 * 	_ex.context.call("command", "consume", "android.test.purchased");
 			 *  
-			 *  // IMPORTANT: When you hard-consuming a product like this, you need to clear your cache also: Billing.clearCache();
+			 *  // IMPORTANT: When you are hard-consuming a product like this, you need to clear your cache also: Billing.clearCache();
 			 *	Billing.clearCache();
 			 * 	
 			 * 	When building your app for production, you must use the Billing.doPayment() method only. using the consume command like above is 

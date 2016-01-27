@@ -177,5 +177,5 @@ http://www.myflashlabs.com/product/in-app-purchase-ane-adobe-air-native-extensio
 [How to embed ANEs into **FlashBuilder**, **FlashCC** and **FlashDevelop**](https://www.youtube.com/watch?v=Oubsb_3F3ec&list=PL_mmSjScdnxnSDTMYb1iDX4LemhIJrt1O)  
 
 # Changelog
-*Feb, 2016 - V1.0:*
-* Not released yet!
+*Jan 27, 2016 - V1.0*
+* beginning of the journey!

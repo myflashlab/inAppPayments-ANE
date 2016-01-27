@@ -1,0 +1,4 @@
+In App Payments Adobe Air Native Extension
+
+*Jan 27, 2016 - V1.0*
+* beginning of the journey!
