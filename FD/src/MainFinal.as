@@ -53,9 +53,10 @@ package
 		public function MainFinal():void 
 		{
 			Multitouch.inputMode = MultitouchInputMode.GESTURE;
-			NativeApplication.nativeApplication.addEventListener(Event.ACTIVATE, handleActivate, false, 0, true);
-			NativeApplication.nativeApplication.addEventListener(InvokeEvent.INVOKE, onInvoke, false, 0, true);
-			NativeApplication.nativeApplication.addEventListener(KeyboardEvent.KEY_DOWN, handleKeys, false, 0, true);
+			NativeApplication.nativeApplication.addEventListener(Event.ACTIVATE, handleActivate);
+			NativeApplication.nativeApplication.addEventListener(Event.DEACTIVATE, handleDeactivate);
+			NativeApplication.nativeApplication.addEventListener(InvokeEvent.INVOKE, onInvoke);
+			NativeApplication.nativeApplication.addEventListener(KeyboardEvent.KEY_DOWN, handleKeys);
 			
 			stage.addEventListener(Event.RESIZE, onResize);
 			stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -105,6 +106,11 @@ package
 		private function handleActivate(e:Event):void
 		{
 			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
+		}
+		
+		private function handleDeactivate(e:Event):void
+		{
+			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.NORMAL;
 		}
 		
 		private function handleKeys(e:KeyboardEvent):void
