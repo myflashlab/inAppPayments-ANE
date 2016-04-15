@@ -1,5 +1,8 @@
 In App Payments Adobe Air Native Extension
 
+*Apr 15, 2016 - V1.0.2*
+* Fixed a quick bug described here: https://github.com/myflashlab/inAppPayments-ANE/issues/5
+
 *Apr 02, 2016 - V1.0.1*
 * Fixed a quick bug described here: https://github.com/myflashlab/inAppPayments-ANE/issues/4
 
