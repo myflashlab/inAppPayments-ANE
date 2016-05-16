@@ -1,5 +1,9 @@
 In App Payments Adobe Air Native Extension
 
+*May 16, 2016 - V2.0.0*
+* Added ```Billing.products``` property which will return an Array of ```Product``` objects containing SKU details about the products you have created on Apple or Google consoles
+* Added ```Billing.forceConsume("productId", onResultFunction);``` method so you can force consume purchased products on the Android side
+
 *Apr 15, 2016 - V1.0.2*
 * Fixed a quick bug described here: https://github.com/myflashlab/inAppPayments-ANE/issues/5
 

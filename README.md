@@ -1,4 +1,4 @@
-# Identical in-app-payments ANE V1.0.2 for Android+iOS
+# Identical in-app-payments ANE V2.0.0 for Android+iOS
 In-app-payments ANE is the first Adobe Air Native Extension which has made sure the Android and iOS in-app-billing work flows are identical so Air developers won't be confused at all. While making these two completely different APIs are identical, we made sure that you will have access to almost all their powers so you are not missing anything important.
 
 You will be able to manage your in-app payments in the most efficient way with an identical AS3 API.
@@ -20,6 +20,7 @@ you may like to see the ANE in action? [Download demo .apk](https://github.com/m
 import com.myflashlab.air.extensions.billing.Billing;
 import com.myflashlab.air.extensions.billing.BillingType;
 import com.myflashlab.air.extensions.billing.Purchase;
+import com.myflashlab.air.extensions.billing.Product;
 
 // The first step is to setup your Google in-app products and iOS products in your Google Play and iTunes Connect consoles.
 // there are a lot of tutorials on the web talking about how you can setup your consoles with the product IDs and using this
@@ -38,6 +39,22 @@ private function onInitResult($status:int, $msg:String):void
 		// if $status is 0 it means that the initialization was not successful and this may happen because of many different reasons
 		// which we have talked about them in the demo project sample codes. Please check FD/src/MainFinal.as file for more details.
 		return;
+	}
+	else
+	{
+		// Here's the list of available/online products which you can make purchases on them:
+		var availableProducts:Array = Billing.products;
+		var currProduct:Product;
+		for (var i:int = 0; i < availableProducts.length; i++) 
+		{
+			currProduct = availableProducts[i];
+			trace("\t productId = " + 	currProduct.productId);
+			trace("\t title = " + 		currProduct.title);
+			trace("\t description = " + currProduct.description);
+			trace("\t price = " + 		currProduct.price);
+			trace("\t currency = " + 	currProduct.currency);
+			trace("---------------------------------------");
+		}
 	}
 		
 	/*
@@ -177,6 +194,10 @@ http://www.myflashlabs.com/product/in-app-purchase-ane-adobe-air-native-extensio
 [How to embed ANEs into **FlashBuilder**, **FlashCC** and **FlashDevelop**](https://www.youtube.com/watch?v=Oubsb_3F3ec&list=PL_mmSjScdnxnSDTMYb1iDX4LemhIJrt1O)  
 
 # Changelog
+*May 16, 2016 - V2.0.0*
+* Added ```Billing.products``` property which will return an Array of ```Product``` objects containing SKU details about the products you have created on Apple or Google consoles
+* Added ```Billing.forceConsume("productId", onResultFunction);``` method so you can force consume purchased products on the Android side
+
 *Apr 15, 2016 - V1.0.2*
 * Fixed a quick bug described here: https://github.com/myflashlab/inAppPayments-ANE/issues/5
 
