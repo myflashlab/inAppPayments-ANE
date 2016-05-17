@@ -9,6 +9,9 @@ You will be able to manage your in-app payments in the most efficient way with a
 * Supports consumable, permanent and subscription payment types.
 * Returns purchase information + developer-specified string uppon a successful purchase process.
 
+# asdoc
+[find the latest asdoc for this ANE here.](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/package-detail.html)
+
 # Demo .apk
 you may like to see the ANE in action? [Download demo .apk](https://github.com/myflashlab/inAppPayments-ANE/tree/master/FD/dist)
 
