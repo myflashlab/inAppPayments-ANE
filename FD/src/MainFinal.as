@@ -26,6 +26,7 @@ package
 	import com.myflashlab.air.extensions.billing.Billing;
 	import com.myflashlab.air.extensions.billing.BillingType;
 	import com.myflashlab.air.extensions.billing.Purchase;
+	import com.myflashlab.air.extensions.billing.Product;
 	
 	import com.doitflash.text.modules.MySprite;
 	import com.doitflash.starling.utils.list.List;
@@ -168,7 +169,7 @@ package
 			// omit this line or set to false when you're ready to make a release version of your app. [When developing, make sure you are setting this to true]
 			Billing.IS_DEBUG_MODE = true;
 			
-			Billing.init(		"Android in-app-billing key copied from your Google Play console...", 
+			Billing.init("Android in-app-billing key copied from your Google Play console...", 
 			
 								[	// Android product IDs which you have already set in your Google Play console.
 									"test01", 
@@ -191,28 +192,23 @@ package
 		private function onInitResult($status:int, $msg:String):void
 		{
 			/**
-			 * 	When developing your app, you may need to consume an already owned item. This method is for for test reasons on Android ONLY.
-			 * 	You should NOT use this method in production. So, if you need to consume a permenant product consume it like this and the ANE 
-			 * 	will allow you to purchase the same item again. I am sure you will need this soon or later, when developing :) So, cheers.
+			 *	When developing, you may need to consume an already owned item. On the Android side, you may do as follow:
+			 *	
+			 *	Billing.forceConsume("productId", onResult);
+			 *	function onResult($result:Boolean):void
+			 *	{
+			 *		if($result)
+			 *		{
+			 *			// your purchase has been consumed successfully
+			 *		}
+			 *		else
+			 *		{
+			 *			// something went wrong! You may try again.
+			 *		}
+			 *	}
 			 * 
-			 *  // to be able to manually consume a permanant product on Android, first you need to get the Billing instance like this:
-			 *  var _ex:Billing = Billing.init(.......);
-			 *  
-			 *  // you may also like to add a listener for debugging reasons?
-			 *  _ex.addEventListener(StatusEvent.STATUS, onStatus);
-			 * 	
-			 * 	// pass in your product id for which you wish to consume
-			 * 	_ex.context.call("command", "consume", "android.test.purchased");
-			 *  
-			 *  // IMPORTANT: When you are hard-consuming a product like this, you need to clear your cache also: Billing.clearCache();
-			 *	Billing.clearCache();
-			 * 	
-			 * 	When building your app for production, you must use the Billing.doPayment() method only. using the consume command like above is 
-			 *  for debug reasons only.
-			 * 
-			 * 	Unfortunaitly on the iOS side, you get "one shot" to buy your item because Apple remembers that your account has purchased that 
-			 * 	item. If you need to test again, you need a different test account. There is no way to reset these purchases like how we can in 
-			 * 	Android.
+			 *	Unfortunaitly on the iOS side, you get "one shot" to buy your item because Apple remembers that your account has purchased that item. 
+			 *	If you need to test again, you need a different test account. There is no way to reset these purchases like how we can in Android.
 			 */
 			
 			
@@ -221,27 +217,43 @@ package
 			
 			if (!Boolean($status))
 			{
-				C.log("\nThere's been a problem initializing or supporting in-app-purchases. Are you sure you have setup your project correctly?");
+				C.log("\n There's been a problem initializing or supporting in-app-purchases. Are you sure you have setup your project correctly?");
 				C.log("check the following probable causes:");
 				
-				C.log("General reasons:");
-				C.log("\t1) Check your internet connection");
+				C.log("\n General reasons:");
+				C.log("\t 1) Check your internet connection");
 				
-				C.log("Android reasons:");
-				C.log("\t1) Have you uploaded your test .apk to your Google play console?");
-				C.log("\t2) Check your Android Key");
-				C.log("\t3) Your app must be in alpha, beta or release state on the Google console.");
-				C.log("\t4) Make sure your product IDs are matching the ones you entered in Google Play console?");
-				C.log("\t5) Sometimes it takes a few hours before Google can propagate your product IDs across all servers.");
-				C.log("\t6) Check this link: http://bfy.tw/3d26");
+				C.log("\n Android reasons:");
+				C.log("\t 1) Have you uploaded your test .apk to your Google play console?");
+				C.log("\t 2) Check your Android Key");
+				C.log("\t 3) Your app must be in alpha, beta or release state on the Google console.");
+				C.log("\t 4) Make sure your product IDs are matching the ones you entered in Google Play console?");
+				C.log("\t 5) Sometimes it takes a few hours before Google can propagate your product IDs across all servers.");
+				C.log("\t 6) Check this link: http://bfy.tw/3d26");
 				
-				C.log("iOS reasons:");
-				C.log("\t1) Check your product IDs based on what you setup in iTunes Connect console");
-				C.log("\t2) Have you completed the bank information and billing contracts with Apple yet?!");
-				C.log("\t3) Sometimes it takes a few hours before iTunes Connect can propagate your product IDs across all servers.");
-				C.log("\t4) Check this link: http://bfy.tw/3d1v");
+				C.log("\n iOS reasons:");
+				C.log("\t 1) Check your product IDs based on what you setup in iTunes Connect console");
+				C.log("\t 2) Have you completed the bank information and billing contracts with Apple yet?!");
+				C.log("\t 3) Sometimes it takes a few hours before iTunes Connect can propagate your product IDs across all servers.");
+				C.log("\t 4) Check this link: http://bfy.tw/3d1v");
 				
 				return;
+			}
+			else
+			{
+				C.log("Here's the list of available/online products which you can make purchases on them: \n");
+				var availableProducts:Array = Billing.products;
+				var currProduct:Product;
+				for (var i:int = 0; i < availableProducts.length; i++) 
+				{
+					currProduct = availableProducts[i];
+					C.log("\t productId = " + 	currProduct.productId);
+					C.log("\t title = " + 		currProduct.title);
+					C.log("\t description = " + currProduct.description);
+					C.log("\t price = " + 		currProduct.price);
+					C.log("\t currency = " + 	currProduct.currency);
+					C.log("---------------------------------------");
+				}
 			}
 			
 			var btn2:MySprite = createBtn("getPurchases");
