@@ -1,5 +1,5 @@
-# Identical in-app-payments ANE V2.0.0 for Android+iOS
-In-app-payments ANE is the first Adobe Air Native Extension which has made sure the Android and iOS in-app-billing work flows are identical so Air developers won't be confused at all. While making these two completely different APIs are identical, we made sure that you will have access to almost all their powers so you are not missing anything important.
+# Identical in-app-payments ANE V2.1.0 for Android+iOS
+In-app-payments ANE is the first Adobe AIR Native Extension which has made sure the Android and iOS in-app-billing work flows are identical so AIR developers won't be confused at all. While making these two completely different APIs are identical, we made sure that you will have access to almost all their powers so you are not missing anything important.
 
 You will be able to manage your in-app payments in the most efficient way with an identical AS3 API.
 
@@ -15,7 +15,9 @@ You will be able to manage your in-app payments in the most efficient way with a
 **NOTICE**: the demo ANE works only after you hit the "OK" button in the dialog which opens. in your tests make sure that you are NOT calling other ANE methods prior to hitting the "OK" button.
 [Download the ANE](https://github.com/myflashlab/inAppPayments-ANE/tree/master/FD/lib)
 
-# Air Usage
+# AIR Usage
+For the complete AS3 code usage, see the [demo project here](https://github.com/myflashlab/inAppPayments-ANE/blob/master/FD/src/MainFinal.as).
+
 ```actionscript
 import com.myflashlab.air.extensions.billing.Billing;
 import com.myflashlab.air.extensions.billing.BillingType;
@@ -176,14 +178,32 @@ FOR iOS:
 Embedding the ANE:
 -->
   <extensions>
+  
 	<extensionID>com.myflashlab.air.extensions.billing</extensionID>
+	
+	<!-- The following dependency ANEs are only required when compiling for Android -->
+	<extensionID>com.myflashlab.air.extensions.dependency.androidSupport</extensionID>
+	<extensionID>com.myflashlab.air.extensions.dependency.overrideAir</extensionID>
+		
   </extensions>
 -->
 ```
 
 # Requirements 
-1. Android API 15 or higher
-2. iOS SDK 7.1 or higher
+* This ANE is dependent on **androidSupport.ane** and **overrideAir.ane**. Download them from [here](https://github.com/myflashlab/common-dependencies-ANE).
+* Android API 15 or higher
+* iOS SDK 7.1 or higher
+
+# Permissions
+If you are targeting AIR 24 or higher, you need to [take care of the permissions mannually](http://www.myflashlabs.com/adobe-air-app-permissions-android-ios/). Below are the list of Permissions this ANE might require. (Note: *Necessary Permissions* are those that the ANE will NOT work without them and *Optional Permissions* are those which are needed only if you are using some specific features in the ANE.)
+
+Check out the demo project available at this repository to see how we have used our [PermissionCheck ANE](http://www.myflashlabs.com/product/native-access-permission-check-settings-menu-air-native-extension/) to ask for the permissions.
+
+**Necessary Permissions:**  
+none
+
+**Optional Permissions:**  
+none
 
 # Commercial Version
 http://www.myflashlabs.com/product/in-app-purchase-ane-adobe-air-native-extension/
@@ -194,6 +214,10 @@ http://www.myflashlabs.com/product/in-app-purchase-ane-adobe-air-native-extensio
 [How to embed ANEs into **FlashBuilder**, **FlashCC** and **FlashDevelop**](https://www.youtube.com/watch?v=Oubsb_3F3ec&list=PL_mmSjScdnxnSDTMYb1iDX4LemhIJrt1O)  
 
 # Changelog
+*Nov 09, 2016 - V2.1.0*
+* Optimized for Android manual permissions if you are targeting AIR SDK 24+
+* From now on, this ANE will depend on androidSupport.ane and overrideAir.ane on the Android side
+
 *May 16, 2016 - V2.0.0*
 * Added ```Billing.products``` property which will return an Array of ```Product``` objects containing SKU details about the products you have created on Apple or Google consoles
 * Added ```Billing.forceConsume("productId", onResultFunction);``` method so you can force consume purchased products on the Android side

@@ -94,9 +94,7 @@ package
 			_list.vDirection = Direction.TOP_TO_BOTTOM;
 			_list.space = BTN_SPACE;
 			
-			if (stage) init();
-			else addEventListener(Event.ADDED_TO_STAGE, init);
-			onResize();
+			init();
 		}
 		
 		private function onInvoke(e:InvokeEvent):void
@@ -213,7 +211,7 @@ package
 			
 			
 			C.log("init was successful: " + Boolean($status));
-			trace("init msg = " + $msg);
+			C.log("init msg = " + $msg);
 			
 			if (!Boolean($status))
 			{

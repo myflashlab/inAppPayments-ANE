@@ -1,5 +1,9 @@
 In App Payments Adobe Air Native Extension
 
+*Nov 09, 2016 - V2.1.0*
+* Optimized for Android manual permissions if you are targeting AIR SDK 24+
+* From now on, this ANE will depend on androidSupport.ane and overrideAir.ane on the Android side
+
 *May 16, 2016 - V2.0.0*
 * Added ```Billing.products``` property which will return an Array of ```Product``` objects containing SKU details about the products you have created on Apple or Google consoles
 * Added ```Billing.forceConsume("productId", onResultFunction);``` method so you can force consume purchased products on the Android side
