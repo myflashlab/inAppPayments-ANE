@@ -2,7 +2,7 @@
 <application xmlns="http://ns.adobe.com/air/application/24.0">
   <id>com.doitflash.exInAppBilling</id> <!--Android-->
   <!--<id>com.doitflash.inAppBilling2</id>--> <!--iOS-->
-  <versionNumber>2.1.0</versionNumber>
+  <versionNumber>2.2.0</versionNumber>
   <supportedProfiles>mobileDevice</supportedProfiles>
   <filename>exBilling</filename>
   <name>In App Payments</name>
@@ -46,7 +46,7 @@
     <InfoAdditions>
 		
 		<![CDATA[<key>MinimumOSVersion</key>
-		<string>7.1</string>
+		<string>8.0</string>
 		
 		<key>UIStatusBarStyle</key>
 		<string>UIStatusBarStyleBlackOpaque</string>
@@ -95,7 +95,7 @@
 		
 		<extensionID>com.myflashlab.air.extensions.billing</extensionID>
 		
-		<!-- The following dependency ANEs are only required when compiling for Android -->
+		<!-- download the dependency ANEs from https://github.com/myflashlab/common-dependencies-ANE -->
 		<extensionID>com.myflashlab.air.extensions.dependency.androidSupport</extensionID>
 		<extensionID>com.myflashlab.air.extensions.dependency.overrideAir</extensionID>
 		

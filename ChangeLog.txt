@@ -1,5 +1,10 @@
 In App Payments Adobe Air Native Extension
 
+*Mar 19, 2017 - V2.2.0*
+* Even if you are building for iOS only, you still need to include the following ANE as the dependency ```overrideAir.ane V4.0.0```
+* Min iOS version to support this ANE will be iOS 8.0+ from now on.
+* optimized for iTunes missing title problem described at [issue 32](https://github.com/myflashlab/inAppPayments-ANE/issues/32)
+
 *Nov 09, 2016 - V2.1.0*
 * Optimized for Android manual permissions if you are targeting AIR SDK 24+
 * From now on, this ANE will depend on androidSupport.ane and overrideAir.ane on the Android side

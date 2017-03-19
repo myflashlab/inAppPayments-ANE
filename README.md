@@ -1,4 +1,4 @@
-# Identical in-app-payments ANE V2.1.0 for Android+iOS
+# Identical in-app-payments ANE V2.2.0 for Android+iOS
 In-app-payments ANE is the first Adobe AIR Native Extension which has made sure the Android and iOS in-app-billing work flows are identical so AIR developers won't be confused at all. While making these two completely different APIs are identical, we made sure that you will have access to almost all their powers so you are not missing anything important.
 
 You will be able to manage your in-app payments in the most efficient way with an identical AS3 API.
@@ -170,7 +170,7 @@ FOR ANDROID:
 FOR iOS:
 -->
 <key>MinimumOSVersion</key>
-<string>7.1</string>
+<string>8.0</string>
 	
 	
 	
@@ -181,7 +181,7 @@ Embedding the ANE:
   
 	<extensionID>com.myflashlab.air.extensions.billing</extensionID>
 	
-	<!-- The following dependency ANEs are only required when compiling for Android -->
+	<!-- download the dependency ANEs from https://github.com/myflashlab/common-dependencies-ANE -->
 	<extensionID>com.myflashlab.air.extensions.dependency.androidSupport</extensionID>
 	<extensionID>com.myflashlab.air.extensions.dependency.overrideAir</extensionID>
 		
@@ -192,7 +192,7 @@ Embedding the ANE:
 # Requirements 
 * This ANE is dependent on **androidSupport.ane** and **overrideAir.ane**. Download them from [here](https://github.com/myflashlab/common-dependencies-ANE).
 * Android API 15 or higher
-* iOS SDK 7.1 or higher
+* iOS SDK 8.0 or higher
 
 # Permissions
 If you are targeting AIR 24 or higher, you need to [take care of the permissions mannually](http://www.myflashlabs.com/adobe-air-app-permissions-android-ios/). Below are the list of Permissions this ANE might require. (Note: *Necessary Permissions* are those that the ANE will NOT work without them and *Optional Permissions* are those which are needed only if you are using some specific features in the ANE.)
@@ -214,6 +214,11 @@ http://www.myflashlabs.com/product/in-app-purchase-ane-adobe-air-native-extensio
 [How to embed ANEs into **FlashBuilder**, **FlashCC** and **FlashDevelop**](https://www.youtube.com/watch?v=Oubsb_3F3ec&list=PL_mmSjScdnxnSDTMYb1iDX4LemhIJrt1O)  
 
 # Changelog
+*Mar 19, 2017 - V2.2.0*
+* Even if you are building for iOS only, you still need to include the following ANE as the dependency ```overrideAir.ane V4.0.0```
+* Min iOS version to support this ANE will be iOS 8.0+ from now on.
+* optimized for iTunes missing title problem described at [issue 32](https://github.com/myflashlab/inAppPayments-ANE/issues/32)
+
 *Nov 09, 2016 - V2.1.0*
 * Optimized for Android manual permissions if you are targeting AIR SDK 24+
 * From now on, this ANE will depend on androidSupport.ane and overrideAir.ane on the Android side
