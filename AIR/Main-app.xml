@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<application xmlns="http://ns.adobe.com/air/application/25.0">
+<application xmlns="http://ns.adobe.com/air/application/28.0">
     <id>com.doitflash.exInAppBilling</id> <!--Android-->
     <!--<id>com.doitflash.inAppBilling2</id>--> <!--iOS-->
-    <versionNumber>2.2.2</versionNumber>
+    <versionNumber>2.3.0</versionNumber>
     <supportedProfiles>mobileDevice</supportedProfiles>
     <filename>exBilling</filename>
     <name>In App Payments</name>
@@ -19,32 +19,22 @@
             <!-- required for in-app-billing for Google Play -->
             <uses-permission android:name="com.android.vending.BILLING" />
             
-            <!-- required for in-app-billing for Cafebazaar -->
-            <uses-permission android:name="com.farsitel.bazaar.permission.PAY_THROUGH_BAZAAR" />
-            
             <application android:hardwareAccelerated="true" android:allowBackup="true">
             
             <activity android:hardwareAccelerated="true">
-            <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
-            <action android:name="android.intent.action.VIEW" />
-            <category android:name="android.intent.category.BROWSABLE" />
-            <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+                <intent-filter>
+                    <action android:name="android.intent.action.MAIN" />
+                    <category android:name="android.intent.category.LAUNCHER" />
+                </intent-filter>
+                <intent-filter>
+                    <action android:name="android.intent.action.VIEW" />
+                    <category android:name="android.intent.category.BROWSABLE" />
+                    <category android:name="android.intent.category.DEFAULT" />
+                </intent-filter>
             </activity>
             
             <!-- required for billing dialog -->
             <activity android:name="com.doitflash.inAppBilling.utils.MyPurchase" android:theme="@style/Theme.Transparent" />
-            
-            <!-- To Support in-app-payments for Amazon -->
-            <receiver android:name="com.amazon.inapp.iap.ResponseReceiver">
-            <intent-filter>
-            <action android:name="com.amazon.inapp.purchasing.NOTIFY" android:permission="com.amazon.inapp.purchasing.Permission.NOTIFY">
-            </action></intent-filter>
-            </receiver>
             
             </application>
             </manifest>]]></manifestAdditions>
@@ -56,7 +46,7 @@
         <InfoAdditions>
             
             <![CDATA[<key>MinimumOSVersion</key>
-                <string>8.0</string>
+                <string>9.0</string>
                 
                 <key>UIStatusBarStyle</key>
                 <string>UIStatusBarStyleBlackOpaque</string>
@@ -69,9 +59,10 @@
                 
                 <key>UIDeviceFamily</key>
                 <array>
-                <string>1</string>
-                <string>2</string>
-                </array>]]>
+                    <string>1</string>
+                    <string>2</string>
+                </array>
+            ]]>
             
         </InfoAdditions>
         

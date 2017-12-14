@@ -1,5 +1,19 @@
 In App Payments Adobe Air Native Extension
 
+*Dec 15, 2017 - V2.3.0*
+* updated with the latest androidSupport and overrideAir dependencies.
+* synced to be used with the [ANE-LAB software](https://github.com/myflashlab/ANE-LAB/).
+* Added ```Billing.iOSReceipt``` property.
+* Added **autoRenewing** and **signature** properties to the ```Purchase``` class which are relevant for the Android side only.
+* Added support for iOS 11+ promo purchases through app store. You need to add the following listeners right after initializing the ANE.
+```actionscript
+// listen to possible promo purchase results on iOS 11+
+Billing.listener.addEventListener(BillingEvent.PROMO_PURCHASE_FAILED, onIosPromoPurchaseFailed);
+Billing.listener.addEventListener(BillingEvent.PROMO_PURCHASE_SUCCESS, onIosPromoPurchaseSuccess);
+```
+* min iOS version to support this ANE is 9.0
+* you need to compile your project with AIR SDK 28.0+
+
 *Aug 05, 2017 - V2.2.2*
 * Fixed issue [21](https://github.com/myflashlab/inAppPayments-ANE/issues/21)
 * Fixed issue [31](https://github.com/myflashlab/inAppPayments-ANE/issues/31)
