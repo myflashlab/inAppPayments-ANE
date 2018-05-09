@@ -1,5 +1,9 @@
 In App Payments Adobe Air Native Extension
 
+*May 9, 2018 - V2.5.0*
+* fixed [issue 69](https://github.com/myflashlab/inAppPayments-ANE/issues/69)
+* fixed [issue 66](https://github.com/myflashlab/inAppPayments-ANE/issues/66)
+
 *Dec 15, 2017 - V2.3.0*
 * updated with the latest androidSupport and overrideAir dependencies.
 * synced to be used with the [ANE-LAB software](https://github.com/myflashlab/ANE-LAB/).

@@ -1,4 +1,4 @@
-# Identical in-app-payments ANE V2.3.0 for Android+iOS
+# Identical in-app-payments ANE V2.5.0 for Android+iOS
 In-app-payments ANE is the first Adobe AIR Native Extension which has made sure the Android and iOS in-app-billing work flows are identical so AIR developers won't be confused at all. While making these two completely different APIs are identical, we made sure that you will have access to all their features so you are not missing anything important.
 
 You will be able to manage your in-app payments in the most efficient way with an identical AS3 API.
@@ -191,6 +191,7 @@ function onForceConsumeResult($result:Boolean):void
 }
 ```
 # AIR Usage - iOS 11+ promotional purchases
+**IMPORTANT:** to use this feature, the ANE MUST be initialized the soonest possible in your app. the best place for that is the Constructor function of your project's Document Class.
 ```actionscript
 // listen to possible promo purchase results on iOS 11+
 // Add these listeners right after the Billing.init method.
@@ -286,17 +287,21 @@ Embedding the ANE:
 * This ANE is dependent on **androidSupport.ane** and **overrideAir.ane**. Download them from [here](https://github.com/myflashlab/common-dependencies-ANE).
 * Android API 15 or higher
 * iOS SDK 9.0 or higher
-* AIR SDK 28+
+* AIR SDK 29+
 
 # Commercial Version
 http://www.myflashlabs.com/product/in-app-purchase-ane-adobe-air-native-extension/
 
-![in-app-payments ANE](http://www.myflashlabs.com/wp-content/uploads/2015/12/product_adobe-air-ane-in-app-payments-595x738.jpg)
+![in-app-payments ANE](https://www.myflashlabs.com/wp-content/uploads/2015/12/product_adobe-air-ane-in-app-payments-595x738.jpg)
 
 # Tutorials
 [How to embed ANEs into **FlashBuilder**, **FlashCC** and **FlashDevelop**](https://www.youtube.com/watch?v=Oubsb_3F3ec&list=PL_mmSjScdnxnSDTMYb1iDX4LemhIJrt1O)  
 
 # Changelog
+*May 9, 2018 - V2.5.0*
+* fixed [issue 69](https://github.com/myflashlab/inAppPayments-ANE/issues/69)
+* fixed [issue 66](https://github.com/myflashlab/inAppPayments-ANE/issues/66)
+
 *Dec 15, 2017 - V2.3.0*
 * updated with the latest androidSupport and overrideAir dependencies.
 * synced to be used with the [ANE-LAB software](https://github.com/myflashlab/ANE-LAB/).
