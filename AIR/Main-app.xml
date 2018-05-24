@@ -2,7 +2,7 @@
 <application xmlns="http://ns.adobe.com/air/application/29.0">
     <id>com.doitflash.exInAppBilling</id> <!--Android-->
     <!--<id>com.doitflash.inAppBilling2</id>--> <!--iOS-->
-    <versionNumber>2.5.0</versionNumber>
+    <versionNumber>2.5.1</versionNumber>
     <supportedProfiles>mobileDevice</supportedProfiles>
     <filename>exBilling</filename>
     <name>In App Payments</name>
