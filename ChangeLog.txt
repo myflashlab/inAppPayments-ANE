@@ -1,5 +1,8 @@
 In App Payments Adobe Air Native Extension
 
+*Sep 23, 2018 - V2.5.2*
+* Removed androidSupport dependency
+
 *May 23, 2018 - V2.5.1*
 * fixed [issue 76](https://github.com/myflashlab/inAppPayments-ANE/issues/76)
 

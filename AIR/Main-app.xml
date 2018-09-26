@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<application xmlns="http://ns.adobe.com/air/application/29.0">
+<application xmlns="http://ns.adobe.com/air/application/30.0">
     <id>com.doitflash.exInAppBilling</id> <!--Android-->
     <!--<id>com.doitflash.inAppBilling2</id>--> <!--iOS-->
-    <versionNumber>2.5.1</versionNumber>
+    <versionNumber>2.5.2</versionNumber>
     <supportedProfiles>mobileDevice</supportedProfiles>
     <filename>exBilling</filename>
     <name>In App Payments</name>
@@ -12,9 +12,7 @@
             <uses-permission android:name="android.permission.INTERNET" />
             <uses-permission android:name="android.permission.WAKE_LOCK" />
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-            
-            <!--The new Permission thing on Android works ONLY if you are targetting Android SDK 23 or higher-->
-            <uses-sdk android:targetSdkVersion="23"/>
+            <uses-sdk android:targetSdkVersion="26"/>
             
             <!-- required for in-app-billing for Google Play -->
             <uses-permission android:name="com.android.vending.BILLING" />
@@ -61,8 +59,7 @@
                 <array>
                     <string>1</string>
                     <string>2</string>
-                </array>
-            ]]>
+                </array>]]>
             
         </InfoAdditions>
         
@@ -109,8 +106,7 @@
         
         <extensionID>com.myflashlab.air.extensions.billing</extensionID>
         
-        <!-- download the dependency ANEs from https://github.com/myflashlab/common-dependencies-ANE -->
-        <extensionID>com.myflashlab.air.extensions.dependency.androidSupport</extensionID>
+        <!-- dependency ANEs https://github.com/myflashlab/common-dependencies-ANE -->
         <extensionID>com.myflashlab.air.extensions.dependency.overrideAir</extensionID>
         
     </extensions>

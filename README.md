@@ -1,4 +1,4 @@
-# Identical in-app-payments ANE V2.5.1 for Android+iOS
+# Identical in-app-payments ANE V2.5.2 for Android+iOS
 In-app-payments ANE is the first Adobe AIR Native Extension which has made sure the Android and iOS in-app-billing work flows are identical so AIR developers won't be confused at all. While making these two completely different APIs are identical, we made sure that you will have access to all their features so you are not missing anything important.
 
 You will be able to manage your in-app payments in the most efficient way with an identical AS3 API.
@@ -275,8 +275,7 @@ Embedding the ANE:
   
 	<extensionID>com.myflashlab.air.extensions.billing</extensionID>
 	
-	<!-- download the dependency ANEs from https://github.com/myflashlab/common-dependencies-ANE -->
-	<extensionID>com.myflashlab.air.extensions.dependency.androidSupport</extensionID>
+	<!-- dependency ANEs https://github.com/myflashlab/common-dependencies-ANE -->
 	<extensionID>com.myflashlab.air.extensions.dependency.overrideAir</extensionID>
 		
   </extensions>
@@ -284,10 +283,9 @@ Embedding the ANE:
 ```
 
 # Requirements 
-* This ANE is dependent on **androidSupport.ane** and **overrideAir.ane**. Download them from [here](https://github.com/myflashlab/common-dependencies-ANE).
-* Android API 15 or higher
-* iOS SDK 9.0 or higher
-* AIR SDK 29+
+* Android API 15+
+* iOS SDK 9.0+
+* AIR SDK 30+
 
 # Commercial Version
 http://www.myflashlabs.com/product/in-app-purchase-ane-adobe-air-native-extension/
@@ -298,6 +296,9 @@ http://www.myflashlabs.com/product/in-app-purchase-ane-adobe-air-native-extensio
 [How to embed ANEs into **FlashBuilder**, **FlashCC** and **FlashDevelop**](https://www.youtube.com/watch?v=Oubsb_3F3ec&list=PL_mmSjScdnxnSDTMYb1iDX4LemhIJrt1O)  
 
 # Changelog
+*Sep 23, 2018 - V2.5.2*
+* Removed androidSupport dependency
+
 *May 23, 2018 - V2.5.1*
 * fixed [issue 76](https://github.com/myflashlab/inAppPayments-ANE/issues/76)
 
