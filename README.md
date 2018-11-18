@@ -1,4 +1,4 @@
-# Identical in-app-payments ANE V2.5.2 for Android+iOS
+# Identical in-app-payments ANE V2.5.4 for Android+iOS
 In-app-payments ANE is the first Adobe AIR Native Extension which has made sure the Android and iOS in-app-billing work flows are identical so AIR developers won't be confused at all. While making these two completely different APIs are identical, we made sure that you will have access to all their features so you are not missing anything important.
 
 You will be able to manage your in-app payments in the most efficient way with an identical AS3 API.
@@ -10,6 +10,7 @@ You will be able to manage your in-app payments in the most efficient way with a
 * Returns purchase information + developer-specified string uppon a successful purchase process.
 * Returns purchase signature on Android and you have access to purchase receipts on iOS.
 * Supports iOS 11+ [in-app-purchase promotion feature](https://developer.apple.com/app-store/promoting-in-app-purchases/).
+* iOS ParentalGate notifier.
 
 # asdoc
 [find the latest asdoc for this ANE here.](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/package-detail.html)
@@ -296,6 +297,36 @@ http://www.myflashlabs.com/product/in-app-purchase-ane-adobe-air-native-extensio
 [How to embed ANEs into **FlashBuilder**, **FlashCC** and **FlashDevelop**](https://www.youtube.com/watch?v=Oubsb_3F3ec&list=PL_mmSjScdnxnSDTMYb1iDX4LemhIJrt1O)  
 
 # Changelog
+*Nov 18, 2018 - V2.5.4*
+* Works with OverrideAir ANE V5.6.1 or higher
+* Works with ANELAB V1.1.26 or higher
+* Added support for iOS [ParentalGate](https://github.com/myflashlab/inAppPayments-ANE/issues/84)
+```actionscript
+// set this to true if your app targets kids. (iOS). MUST BE SET BEFORE INITIALIZING THE ANE
+Billing.PARENTAL_GATE = true;
+
+... init the ANE code ...
+
+// This will be called before purchase flow begins 
+Billing.listener.addEventListener(BillingEvent.PARENT_PERMISSION_REQUIRED, onParentPermissionRequired);
+
+private function onParentPermissionRequired(e:BillingEvent):void
+{
+	trace("onParentPermissionRequired: " + e.msg);
+	
+	// this will be called on iOS; ONLY if you have set Billing.PARENTAL_GATE = true;
+	// When iOS 11+ iTunes promo purchase is used, the app starts and the purchase flow begins automatically.
+	// This is normal for most apps but if your app is targeted for kids, your app will be rejected if the
+	// purchase flow starts automatically. Apple requires you to do some parental-gate before any purchase flow
+	// begins.
+	
+	// When you receive this event, you must do some parental-gate and if it was successful, you must tell the
+	// ANE to continue the purchase flow. https://developer.apple.com/app-store/parental-gates/
+	
+	Billing.continueThePreventedPurchaseFlow();
+}
+```
+
 *Sep 23, 2018 - V2.5.2*
 * Removed androidSupport dependency
 
