@@ -139,15 +139,13 @@ package
 			}
 		}
 		
-		private function myDebuggerDelegate($ane:String, $class:String, $msg:String):void
-		{
-			trace("["+$ane+"-"+$class+"]"+$msg);
-		}
-		
 		private function init(e:Event=null):void
 		{
-			// remove this line when in production
-			OverrideAir.enableDebugger(myDebuggerDelegate);
+			// Remove OverrideAir debugger in production builds
+			OverrideAir.enableDebugger(function ($ane:String, $class:String, $msg:String):void
+			{
+				trace($ane+" ("+$class+") "+$msg);
+			});
 			
 			C.log("ANE is initializing and checking if everything is ok with your app/device/productIDs/etc...");
 			C.log("Please wait... \n");
@@ -162,13 +160,16 @@ package
 			 * iOS products built in itunes Connect:
 			 * inappbilling_auto_renewable_one	> Automatically Renewable Subscription
 			 * inappbilling_consumable_one		> Consumable
-			 * inappbilling_managed_one		> Non-Consumable
+			 * inappbilling_managed_one			> Non-Consumable
 			 */
 			
 			// omit this line or set to false when you're ready to make a release version of your app.
 			// ONLY When developing your app, make sure you are setting this to true.
 			Billing.IS_DEBUG_MODE = true;
 			
+			// set this to true only if your app targets kids. (iOS)
+			//Billing.PARENTAL_GATE = true;
+
 			var androidKey:String = "android key copied from your Google Play console...";
 			
 			Billing.init(androidKey,
@@ -176,9 +177,10 @@ package
 					[	// Android product IDs which you have already set in your Google Play console.
 						"test01", // 1.00 managed product
 						"test02", // $1.10 managed product
-						"test03", // $1.20 monthly subscription
-						"test04", // $1.30 yearly subscription
-						"test05" // $46 expensive product
+						"test03", // $1.10 monthly subscription
+						"test04", // $1.31 yearly subscription
+						"test05", // $47 expensive managed product
+						"test06" // $10 managed product
 					],
 					[	// iOS product IDs which you have already set in your iTunes Connect.
 						"inappbilling_auto_renewable_one",
@@ -196,6 +198,7 @@ package
 			// listen to possible promo purchase results on iOS 11+
 			Billing.listener.addEventListener(BillingEvent.PROMO_PURCHASE_FAILED, onIosPromoPurchaseFailed);
 			Billing.listener.addEventListener(BillingEvent.PROMO_PURCHASE_SUCCESS, onIosPromoPurchaseSuccess);
+			Billing.listener.addEventListener(BillingEvent.PARENT_PERMISSION_REQUIRED, onParentPermissionRequired);
 			
 		}
 		
@@ -212,12 +215,10 @@ package
 			if (e.purchase)
 			{
 				C.log("----------------");
-				
 				// we cannot determine the "billingType" on promo purchases!
 				// It's your job to name your productId in a way so you will know this.
-
-				C.log("$data.orderId = " + 			e.purchase.orderId);
-				C.log("$data.developerPayload = " + 		e.purchase.developerPayload); // is always empty on promo purchases
+				C.log("$data.orderId = " + 				e.purchase.orderId);
+				C.log("$data.developerPayload = " + 	e.purchase.developerPayload); // is always empty on promo purchases
 				C.log("$data.productId = " +			e.purchase.productId);
 				C.log("$data.purchaseState = " +		e.purchase.purchaseState);
 				C.log("$data.purchaseTime = " +			e.purchase.purchaseTime);
@@ -231,6 +232,22 @@ package
 				// When you clear the cache, the ANE will try to get the purchase results fresh from app store.
 				Billing.clearCache();
 			}
+		}
+		
+		private function onParentPermissionRequired(e:BillingEvent):void
+		{
+			trace("onParentPermissionRequired: " + e.msg);
+			
+			// this will be called on iOS; ONLY if you have set Billing.PARENTAL_GATE = true;
+			// When iOS 11+ iTunes promo purchase is used, the app starts and the purchase flow begins automatically.
+			// This is normal for most apps but if your app is targeted for kids, your app will be rejected if the
+			// purchase flow starts automatically. Apple requires you to do some parental-gate before any purchase flow
+			// begins.
+			
+			// When you receive this event, you must do some parental-gate and if it was successful, you must tell the
+			// ANE to continue the purchase flow. https://developer.apple.com/app-store/parental-gates/
+			
+			Billing.continueThePreventedPurchaseFlow();
 		}
 		
 		private function onInitResult($status:int, $msg:String):void
@@ -294,7 +311,7 @@ package
 					currProduct = availableProducts[i];
 					C.log("\t productId = " + 	currProduct.productId);
 					C.log("\t title = " + 		currProduct.title);
-					C.log("\t description = " + 	currProduct.description);
+					C.log("\t description = " + currProduct.description);
 					C.log("\t price = " + 		currProduct.price);
 					C.log("\t currency = " + 	currProduct.currency);
 					C.log("---------------------------------------");
@@ -308,9 +325,9 @@ package
 			function getPurchases(e:MouseEvent):void
 			{
 				C.log("\n Checking what purchases this user has already made.");
-				C.log("This method will return only permanent and subscription payments.");
+				C.log("This method will return only permanet and subscription payments.");
 				C.log("consumable purchases won't be saved on Google or Apple servers and you have to take care of them yourself if necessary based on your app logic.");
-				C.log("If thinking like apple, you can consider this method as the \"restore\" functionality on iOS in-app-purchases.");
+				C.log("If thinking like apple, you can consider this method as the \"restore\" functionalety on iOS in-app-purchases.");
 				C.log("And it does of course do the same thing on Android. which means that if a user has purchase on device A, you will be able to return her purchases on device B with using this method.");
 				C.log("\n Please wait for the list...");
 				Billing.getPurchases(onGetPurchasesResult);
@@ -323,7 +340,7 @@ package
 			function purchaseConsumable(e:MouseEvent):void
 			{
 				C.log("Please wait...");
-				if(Billing.os == Billing.ANDROID)
+				if(OverrideAir.os == OverrideAir.ANDROID)
 				{
 					Billing.doPayment(BillingType.CONSUMABLE, "android.test.purchased", "Payload CONSUMABLE", onPurchaseResult);
 //					Billing.doPayment(BillingType.PERMANENT, "android.test.purchased", "Payload PERMANENT", onPurchaseResult);
@@ -379,7 +396,7 @@ package
 						C.log("purchaseData.purchaseTime = " +		purchaseData.purchaseTime);
 						C.log("purchaseData.purchaseToken = " +		purchaseData.purchaseToken);
 						
-						if(Billing.os == Billing.ANDROID)
+						if(OverrideAir.os == OverrideAir.ANDROID)
 						{
 							C.log("purchaseData.autoRenewing = " +		purchaseData.autoRenewing);
 							C.log("purchaseData.signature = " +			purchaseData.signature);
@@ -404,7 +421,7 @@ package
 			
 			if ($msg == Billing.ALREADY_OWNED_ITEM)
 			{
-				if(Billing.os == Billing.IOS)
+				if(OverrideAir.os == OverrideAir.IOS)
 				{
 					C.log($msg);
 				}
@@ -440,7 +457,7 @@ package
 				C.log("$data.purchaseTime = " +			$data.purchaseTime);
 				C.log("$data.purchaseToken = " +		$data.purchaseToken);
 				
-				if(Billing.os == Billing.ANDROID)
+				if(OverrideAir.os == OverrideAir.ANDROID)
 				{
 					C.log("$data.autoRenewing = " +		$data.autoRenewing);
 					C.log("$data.signature = " +		$data.signature);
