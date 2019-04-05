@@ -29,13 +29,18 @@ package
 	import com.doitflash.mobileProject.commonCpuSrc.DeviceInfo;
 	
 	import com.luaye.console.C;
-	
+
+import flash.utils.setTimeout;
+
 	/**
+	 *
 	 * ...
-	 * @author Hadi Tavakoli - 1/11/2016 3:13 PM
+	 * @author Hadi Tavakoli - 5/4/2019 8:51 AM
 	 */
 	public class Main extends Sprite 
 	{
+		private var _tokens:Array = [];
+		
 		private const BTN_WIDTH:Number = 150;
 		private const BTN_HEIGHT:Number = 60;
 		private const BTN_SPACE:Number = 2;
@@ -49,7 +54,6 @@ package
 			Multitouch.inputMode = MultitouchInputMode.GESTURE;
 			NativeApplication.nativeApplication.addEventListener(Event.ACTIVATE, handleActivate);
 			NativeApplication.nativeApplication.addEventListener(Event.DEACTIVATE, handleDeactivate);
-			NativeApplication.nativeApplication.addEventListener(InvokeEvent.INVOKE, onInvoke);
 			NativeApplication.nativeApplication.addEventListener(KeyboardEvent.KEY_DOWN, handleKeys);
 			
 			stage.addEventListener(Event.RESIZE, onResize);
@@ -90,14 +94,18 @@ package
 			init();
 		}
 		
-		private function onInvoke(e:InvokeEvent):void
-		{
-			NativeApplication.nativeApplication.removeEventListener(InvokeEvent.INVOKE, onInvoke);
-		}
-		
 		private function handleActivate(e:Event):void
 		{
-			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
+			/*
+				On Android, purchases will be read from GooglePlay app and it is recommended
+				to always check it when app is activated. This way, if the user has redeemed
+				a promotion code, your app will know about it.
+				
+				To know about promo-purchases on iOS, you must listen to the event
+				BillingEvent.PROMO_PURCHASE_SUCCESS
+			*/
+			if(OverrideAir.os == OverrideAir.ANDROID && Billing.isInitialized)
+				Billing.getPurchases(onGetPurchasesResult);
 		}
 		
 		private function handleDeactivate(e:Event):void
@@ -147,43 +155,23 @@ package
 				trace($ane+" ("+$class+") "+$msg);
 			});
 			
-			C.log("ANE is initializing and checking if everything is ok with your app/device/productIDs/etc...");
 			C.log("Please wait... \n");
 			
-			/**
-			 * Android products built in Google Play console:
-			 * test01 > Managed product
-			 * test02 > Managed product
-			 * test03 > Monthly subscription
-			 * test04 > Yearly subscription
-			 * 
-			 * iOS products built in itunes Connect:
-			 * inappbilling_auto_renewable_one	> Automatically Renewable Subscription
-			 * inappbilling_consumable_one		> Consumable
-			 * inappbilling_managed_one			> Non-Consumable
-			 */
-			
-			// omit this line or set to false when you're ready to make a release version of your app.
-			// ONLY When developing your app, make sure you are setting this to true.
-			Billing.IS_DEBUG_MODE = true;
-			
 			// set this to true only if your app targets kids. (iOS)
-			//Billing.PARENTAL_GATE = true;
-
-			var androidKey:String = "android key copied from your Google Play console...";
+			Billing.PARENTAL_GATE = false;
 			
-			Billing.init(androidKey,
-					
-					[	// Android product IDs which you have already set in your Google Play console.
+			Billing.init(
+					[	// Android in-app product IDs which you have already set in your Google Play console.
 						"test01", // 1.00 managed product
 						"test02", // $1.10 managed product
-						"test03", // $1.10 monthly subscription
-						"test04", // $1.31 yearly subscription
 						"test05", // $47 expensive managed product
 						"test06" // $10 managed product
 					],
-					[	// iOS product IDs which you have already set in your iTunes Connect.
-						"inappbilling_auto_renewable_one",
+					[ // Android subscription IDs which you have already set in your Google Play console.
+						"test03", // $1.10 monthly subscription
+						"test04" // $1.31 Weekly subscription
+					],
+					[	// iOS in-app product IDs which you have already set in your iTunes Connect.
 						"inappbilling_consumable_one",
 						"inappbilling_managed_one",
 						"inappbilling_managed_two",
@@ -192,13 +180,24 @@ package
 						"inappbilling_managed_five",
 						"promoConsumable1"
 					],
+					[ // iOS subscription IDs which you have already set in your iTunes Connect.
+						"inappbilling_auto_renewable_one"
+					],
 					
 					onInitResult);
 			
-			// listen to possible promo purchase results on iOS 11+
+			// listen to promo purchase on iOS 11+
 			Billing.listener.addEventListener(BillingEvent.PROMO_PURCHASE_FAILED, onIosPromoPurchaseFailed);
 			Billing.listener.addEventListener(BillingEvent.PROMO_PURCHASE_SUCCESS, onIosPromoPurchaseSuccess);
+			
+			// will be dispatched on iOS only if Billing.PARENTAL_GATE is set to true
 			Billing.listener.addEventListener(BillingEvent.PARENT_PERMISSION_REQUIRED, onParentPermissionRequired);
+			
+			// will be dispatched on Android only in case when service is disconnected
+			Billing.listener.addEventListener(BillingEvent.SERVICE_DISCONNECTED, function (e:BillingEvent):void
+			{
+				trace("BillingEvent.SERVICE_DISCONNECTED");
+			});
 			
 		}
 		
@@ -218,19 +217,11 @@ package
 				// we cannot determine the "billingType" on promo purchases!
 				// It's your job to name your productId in a way so you will know this.
 				C.log("$data.orderId = " + 				e.purchase.orderId);
-				C.log("$data.developerPayload = " + 	e.purchase.developerPayload); // is always empty on promo purchases
 				C.log("$data.productId = " +			e.purchase.productId);
 				C.log("$data.purchaseState = " +		e.purchase.purchaseState);
 				C.log("$data.purchaseTime = " +			e.purchase.purchaseTime);
 				C.log("$data.purchaseToken = " +		e.purchase.purchaseToken);
 				C.log("----------------");
-				
-				// If your promo purchase is not a consumable one, you surely expect to see it when
-				// Billing.getPurchases(onGetPurchasesResult); is called, right?
-				// to make sure you are seeing it, always clear cache when PROMO_PURCHASE_SUCCESS happens.
-				
-				// When you clear the cache, the ANE will try to get the purchase results fresh from app store.
-				Billing.clearCache();
 			}
 		}
 		
@@ -255,7 +246,7 @@ package
 			/**
 			 *	When developing, you may need to consume an already owned item. On the Android side, you may do as follow:
 			 *	
-			 *	Billing.forceConsume("productId", onResult);
+			 *	Billing.forceConsume("purchaseToken", onResult);
 			 *	function onResult($result:Boolean):void
 			 *	{
 			 *		if($result)
@@ -268,8 +259,9 @@ package
 			 *		}
 			 *	}
 			 * 
-			 *	Unfortunately on the iOS side, you get "one shot" to buy your item because Apple remembers that your account has purchased that item.
-			 *	If you need to test again, you need a different test account. There is no way to reset these purchases like how we can in Android.
+			 *	Unfortunately on the iOS side, you get "one shot" to buy your item because Apple remembers that your
+			 *	account has purchased that item. If you need to test again, you need a different test account. There
+			 *	is no way to reset these purchases like how we can in Android.
 			 */
 			
 			
@@ -278,45 +270,53 @@ package
 			
 			if (!Boolean($status))
 			{
-				C.log("\n There's been a problem initializing or supporting in-app-purchases. Are you sure you have setup your project correctly?");
-				C.log("check the following probable causes:");
-				
-				C.log("\n General reasons:");
-				C.log("\t 1) Check your internet connection");
-				
-				C.log("\n Android reasons:");
-				C.log("\t 1) Have you uploaded your test .apk to your Google play console?");
-				C.log("\t 2) Check your Android Key");
-				C.log("\t 3) Your app must be in alpha, beta or release state on the Google console.");
-				C.log("\t 4) Make sure your product IDs are matching the ones you entered in Google Play console?");
-				C.log("\t 5) Sometimes it takes a few hours before Google can propagate your product IDs across all servers.");
-				C.log("\t 6) Check this link: http://bfy.tw/3d26");
-				
-				C.log("\n iOS reasons:");
-				C.log("\t 1) Check your product IDs based on what you setup in iTunes Connect console");
-				C.log("\t 2) Have you completed the bank information and billing contracts with Apple yet?!");
-				C.log("\t 3) Sometimes it takes a few hours before iTunes Connect can propagate your product IDs across all servers.");
-				C.log("\t 4) read apple information here: https://developer.apple.com/in-app-purchase/");
-				C.log("\t 5) Check this link: http://bfy.tw/3d1v");
+				/*
+					There's been a problem initializing or supporting in-app-purchases. Are you sure you have setup
+					your project correctly? check the following probable causes:
+					
+					General reasons:
+					1) Check your internet connection
+					
+					Android reasons:
+					1) Your app must be in alpha, beta or release state on the Google console.
+					2) Make sure your product IDs are matching the ones you entered in Google Play console?
+					3) Sometimes it takes a few hours before Google can propagate your product IDs across all servers.
+					4) Have you setup your bank information properly?
+					5) Check this link: http://bfy.tw/3d26
+					
+					iOS reasons:
+					1) Check your product IDs based on what you setup in iTunes Connect console
+					2) Have you completed the bank information and billing contracts with Apple yet?
+					3) Sometimes it takes a few hours before iTunes Connect can propagate your product IDs across all servers.
+					4) read apple information here: https://developer.apple.com/in-app-purchase/
+					5) Check this link: http://bfy.tw/3d1v
+				*/
 				
 				return;
 			}
 			else
 			{
+				/*
+					You may set the Android publicKey only if you want to do purchase verification on the app.
+					Otherwise, you don't need to set it in your app at all and instead do the verification on server.
+					for more details on this regard, read here:
+					https://developer.android.com/google/play/billing/billing_library_overview#Verify-purchase
+				 */
+				Billing.publicKey = "Base64-encoded RSA public key found in your GooglePlay console > Development Tools > Services and APIs";
+				
 				C.log("Here's the list of available/online products which you can make purchases on them: \n");
-				var availableProducts:Array = Billing.products;
-				var currProduct:Product;
-				for (var i:int = 0; i < availableProducts.length; i++) 
+				for (var i:int = 0; i < Billing.products.length; i++)
 				{
-					currProduct = availableProducts[i];
-					C.log("\t productId = " + 	currProduct.productId);
-					C.log("\t title = " + 		currProduct.title);
-					C.log("\t description = " + currProduct.description);
-					C.log("\t price = " + 		currProduct.price);
-					C.log("\t currency = " + 	currProduct.currency);
+					C.log("\t productId = " +		Billing.products[i].productId);
+					C.log("\t title = " +			Billing.products[i].title);
+					C.log("\t description = " +	Billing.products[i].description);
+					C.log("\t price = " +			Billing.products[i].price);
+					C.log("\t currency = " +		Billing.products[i].currency);
 					C.log("---------------------------------------");
 				}
 			}
+			
+			//----------------------------------------------------------------------
 			
 			var btn2:MySprite = createBtn("getPurchases");
 			btn2.addEventListener(MouseEvent.CLICK, getPurchases);
@@ -324,14 +324,22 @@ package
 			
 			function getPurchases(e:MouseEvent):void
 			{
-				C.log("\n Checking what purchases this user has already made.");
-				C.log("This method will return only permanet and subscription payments.");
-				C.log("consumable purchases won't be saved on Google or Apple servers and you have to take care of them yourself if necessary based on your app logic.");
-				C.log("If thinking like apple, you can consider this method as the \"restore\" functionalety on iOS in-app-purchases.");
-				C.log("And it does of course do the same thing on Android. which means that if a user has purchase on device A, you will be able to return her purchases on device B with using this method.");
+				/*
+					Checking what purchases this user has already made. This method will return only permanent and
+					subscription payments. consumable purchases won't be saved on Google or Apple servers and you have
+					to take care of them yourself if necessary based on your app logic.
+					
+					If thinking like apple, you can consider this method as the "restore" functionality on iOS
+					in-app-purchases. And it does of course do the same thing on Android. which means that if a user
+					has purchase on device A, you will be able to return her purchases on device B with using this
+					method.
+				*/
+				
 				C.log("\n Please wait for the list...");
 				Billing.getPurchases(onGetPurchasesResult);
 			}
+			
+			//----------------------------------------------------------------------
 			
 			var btn3:MySprite = createBtn("purchase Consumable!");
 			btn3.addEventListener(MouseEvent.CLICK, purchaseConsumable);
@@ -342,64 +350,144 @@ package
 				C.log("Please wait...");
 				if(OverrideAir.os == OverrideAir.ANDROID)
 				{
-					Billing.doPayment(BillingType.CONSUMABLE, "android.test.purchased", "Payload CONSUMABLE", onPurchaseResult);
-//					Billing.doPayment(BillingType.PERMANENT, "android.test.purchased", "Payload PERMANENT", onPurchaseResult);
+					Billing.doPayment(
+							BillingType.CONSUMABLE,
+							"test01",
+							null,
+							onPurchaseResult);
 				}
 				else
 				{
-					Billing.doPayment(BillingType.CONSUMABLE, "inappbilling_consumable_one", "Payload CONSUMABLE", onPurchaseResult);
+					Billing.doPayment(
+							BillingType.CONSUMABLE,
+							"inappbilling_consumable_one",
+							null,
+							onPurchaseResult);
 				}
 				
 			}
 			
-			var btn5:MySprite = createBtn("Clear Cache");
-			btn5.addEventListener(MouseEvent.CLICK, clearCache);
-			_list.add(btn5);
+			//----------------------------------------------------------------------
 			
+			var btn03:MySprite = createBtn("purchase Permanent!");
+			btn03.addEventListener(MouseEvent.CLICK, purchasePermanent);
+			_list.add(btn03);
 			
-			function clearCache(e:MouseEvent):void
+			function purchasePermanent(e:MouseEvent):void
 			{
-				Billing.clearCache();
+				C.log("Please wait...");
+				if(OverrideAir.os == OverrideAir.ANDROID)
+				{
+					Billing.doPayment(
+							BillingType.PERMANENT,
+							"test05",
+							null,
+							onPurchaseResult);
+				}
+				else
+				{
+					Billing.doPayment(
+							BillingType.PERMANENT,
+							"inappbilling_managed_one",
+							null,
+							onPurchaseResult);
+				}
 				
-				C.log("cache is now cleared!");
 			}
+			
+			//----------------------------------------------------------------------
+			
+			var btn003:MySprite = createBtn("force consume!");
+			btn003.addEventListener(MouseEvent.CLICK, forceConsume);
+			if(OverrideAir.os == OverrideAir.ANDROID) _list.add(btn003);
+			
+			function forceConsume(e:MouseEvent):void
+			{
+				C.log("There are " + _tokens.length + " purchases which are not consumed!");
+				if(_tokens.length > 0)
+				{
+					Billing.forceConsume(_tokens.pop(), onForceConsumeResult)
+				}
+			}
+			
+			//----------------------------------------------------------------------
+			
+			var btn4:MySprite = createBtn("purchase Subscription!");
+			btn4.addEventListener(MouseEvent.CLICK, purchaseSubscription);
+			_list.add(btn4);
+			
+			function purchaseSubscription(e:MouseEvent):void
+			{
+				C.log("Please wait...");
+				if(OverrideAir.os == OverrideAir.ANDROID)
+				{
+					Billing.doPayment(
+							BillingType.AUTO_RENEWAL,
+							"test03",
+							null,
+							onPurchaseResult)
+				}
+				else
+				{
+					Billing.doPayment(
+							BillingType.AUTO_RENEWAL,
+							"inappbilling_auto_renewable_one",
+							null,
+							onPurchaseResult);
+				}
+			}
+			
+			//----------------------------------------------------------------------
+			
+			var btn7:MySprite = createBtn("Redeem");
+			btn7.addEventListener(MouseEvent.CLICK, redeem);
+			if(OverrideAir.os == OverrideAir.ANDROID) _list.add(btn7);
+			
+			function redeem(e:MouseEvent):void
+			{
+				Billing.redeem();
+			}
+			
+			//----------------------------------------------------------------------
 			
 			var btn6:MySprite = createBtn("get iOS Receipt");
 			btn6.addEventListener(MouseEvent.CLICK, getiOSReceipt);
-			_list.add(btn6);
+			if(OverrideAir.os != OverrideAir.ANDROID) _list.add(btn6);
 			
 			function getiOSReceipt(e:MouseEvent):void
 			{
 				trace("iOSReceipt: " + Billing.iOSReceipt);
 			}
 			
+			//----------------------------------------------------------------------
+			
 			onResize();
 		}
 		
-		private function onGetPurchasesResult($purchases:Array):void
+		private function onGetPurchasesResult($purchases:Vector.<Purchase>):void
 		{
-			if ($purchases) // means we have successfully connected the server.
+			if ($purchases)
 			{
+				_tokens = [];
+				
 				if ($purchases.length > 0)
 				{
-					var purchaseData:Purchase;
-					var lng:int = $purchases.length;
-					var i:int;
-					
-					for (i = 0; i < lng; i++)
+					for (var i:int = 0; i < $purchases.length; i++)
 					{
-						purchaseData = $purchases[i];
 						C.log("----------------");
-						C.log("purchaseData.orderId = " + 			purchaseData.orderId);
-						C.log("purchaseData.productId = " +			purchaseData.productId);
-						C.log("purchaseData.purchaseState = " +		purchaseData.purchaseState);
-						C.log("purchaseData.purchaseTime = " +		purchaseData.purchaseTime);
-						C.log("purchaseData.purchaseToken = " +		purchaseData.purchaseToken);
+						C.log("purchaseData.orderId = " + 			$purchases[i].orderId);
+						C.log("purchaseData.productId = " +			$purchases[i].productId);
+						C.log("purchaseData.purchaseState = " +		$purchases[i].purchaseState);
+						C.log("purchaseData.purchaseTime = " +		$purchases[i].purchaseTime);
+						C.log("purchaseData.purchaseToken = " +		$purchases[i].purchaseToken);
+						
+						_tokens.push($purchases[i].purchaseToken);
 						
 						if(OverrideAir.os == OverrideAir.ANDROID)
 						{
-							C.log("purchaseData.autoRenewing = " +		purchaseData.autoRenewing);
-							C.log("purchaseData.signature = " +			purchaseData.signature);
+							C.log("purchaseData.autoRenewing = " +		$purchases[i].autoRenewing);
+							C.log("purchaseData.signature = " +			$purchases[i].signature);
+							trace("verifyAndroidPurchaseLocally: " + Billing.verifyAndroidPurchaseLocally($purchases[i]));
 						}
 						C.log("----------------");
 					}
@@ -415,23 +503,27 @@ package
 			}
 		}
 		
-		private function onPurchaseResult($status:int, $data:Purchase, $msg:String):void
+		private function onPurchaseResult($status:int, $purchase:Purchase, $msg:String, $wasConsumed:Boolean):void
 		{
+			/*
+				IMPORTANT:
+				
+				Unlike iOS which you could create consumable products inside iTunesConnect, in Android you
+				can only create managed products. This means that native devs will always need to manually consume
+				their products. To make your job easier and make sure the Android and iOS sides work similar to each
+				other on this ANE, we are consuming the purchases on Android automatically (if you have set
+				BillingType.CONSUMABLE in the doPayment method).
+				
+				However, it is possible, that due to internet connection or any other reason, the process fails. So
+				your Android consumable item will be purchased but not consumed! When this happens, you must
+				forceConsume the item yourself. To know if this problem has happened, all you have to do is to
+				check if the $wasConsumed param is true or not. and if it's false, call forceConsume on it.
+			*/
+			
+			
 			C.log("\n purchase was successful? " + Boolean($status));
 			
-			if ($msg == Billing.ALREADY_OWNED_ITEM)
-			{
-				if(OverrideAir.os == OverrideAir.IOS)
-				{
-					C.log($msg);
-				}
-				else
-				{
-					C.log("Billing.ALREADY_OWNED_ITEM but for demo reasons we will force consume it!");
-					Billing.forceConsume("android.test.purchased", onForceConsumeResult);
-				}
-			}
-			else if ($msg == Billing.NOT_FOUND_ITEM)
+			if ($msg == Billing.ALREADY_OWNED_ITEM || $msg == Billing.NOT_FOUND_ITEM)
 			{
 				C.log($msg);
 			}
@@ -440,44 +532,52 @@ package
 				C.log("purchase result message = " + $msg);
 			}
 			
-			
-			// to make sure your purchases are synced, it's always a good idea to clear local cache on a successful
-			// purchase callback.
-			Billing.clearCache();
-			
-			
-			if ($data)
+			if ($purchase)
 			{
-				C.log("----------------");
-				C.log("$data.billingType = " + 			$data.billingType);
-				C.log("$data.orderId = " + 				$data.orderId);
-				C.log("$data.developerPayload = " + 	$data.developerPayload);
-				C.log("$data.productId = " +			$data.productId);
-				C.log("$data.purchaseState = " +		$data.purchaseState);
-				C.log("$data.purchaseTime = " +			$data.purchaseTime);
-				C.log("$data.purchaseToken = " +		$data.purchaseToken);
-				
-				if(OverrideAir.os == OverrideAir.ANDROID)
+				if($purchase.billingType == BillingType.CONSUMABLE)
 				{
-					C.log("$data.autoRenewing = " +		$data.autoRenewing);
-					C.log("$data.signature = " +		$data.signature);
-				}
-				C.log("----------------");
-			}
-			
-			function onForceConsumeResult($result:Boolean):void
-			{
-				if($result)
-				{
-					C.log("your purchase has been consumed successfully");
+					C.log("purchase was consumed? " + $wasConsumed);
+					
+					if(!$wasConsumed)
+					{
+						C.log("There's been a problem in consuming this Android product. mark it and consume it manually now...");
+						Billing.forceConsume($purchase.purchaseToken, onForceConsumeResult);
+					}
 				}
 				else
 				{
-					C.log("something went wrong! You may try again.");
+					_tokens.push($purchase.purchaseToken);
 				}
+				
+				C.log("----------------");
+				C.log("$purchase.billingType = " +			$purchase.billingType);
+				C.log("$purchase.orderId = " +				$purchase.orderId);
+				C.log("$purchase.productId = " +				$purchase.productId);
+				C.log("$purchase.purchaseState = " +			$purchase.purchaseState);
+				C.log("$purchase.purchaseTime = " +			$purchase.purchaseTime);
+				C.log("$purchase.purchaseToken = " +			$purchase.purchaseToken);
+				
+				if(OverrideAir.os == OverrideAir.ANDROID)
+				{
+					C.log("$purchase.autoRenewing = " +		$purchase.autoRenewing);
+					C.log("$purchase.signature = " +			$purchase.signature);
+					trace("verifyAndroidPurchaseLocally: "+ Billing.verifyAndroidPurchaseLocally($purchase));
+				}
+				C.log("----------------");
 			}
 		}
 		
+		private function onForceConsumeResult($result:Boolean):void
+		{
+			if($result)
+			{
+				C.log("your purchase has been consumed successfully");
+			}
+			else
+			{
+				C.log("something went wrong! You may try again.");
+			}
+		}
 		
 		
 		

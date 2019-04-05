@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<application xmlns="http://ns.adobe.com/air/application/30.0">
-    <id>com.doitflash.exInAppBilling</id>
-    <versionNumber>2.5.4</versionNumber>
+<application xmlns="http://ns.adobe.com/air/application/32.0">
+    <id>com.doitflash.inAppBilling2</id>
+    <versionNumber>3.0.0</versionNumber>
     <supportedProfiles>mobileDevice</supportedProfiles>
     <filename>exBilling</filename>
     <name>In App Payments</name>
@@ -13,26 +13,29 @@
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
             <uses-sdk android:targetSdkVersion="26"/>
             
-            <!-- required for in-app-billing for Google Play -->
+            <!-- required for billing ANE -->
             <uses-permission android:name="com.android.vending.BILLING" />
             
             <application android:hardwareAccelerated="true" android:allowBackup="true">
             
-            <activity android:hardwareAccelerated="true">
-                <intent-filter>
-                    <action android:name="android.intent.action.MAIN" />
-                    <category android:name="android.intent.category.LAUNCHER" />
-                </intent-filter>
-                <intent-filter>
-                    <action android:name="android.intent.action.VIEW" />
-                    <category android:name="android.intent.category.BROWSABLE" />
-                    <category android:name="android.intent.category.DEFAULT" />
-                </intent-filter>
-            </activity>
-            
-            <!-- required for billing dialog -->
-            <activity android:name="com.doitflash.inAppBilling.utils.MyPurchase" android:theme="@style/Theme.Transparent" />
-            
+                <activity android:hardwareAccelerated="true">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN" />
+                        <category android:name="android.intent.category.LAUNCHER" />
+                    </intent-filter>
+                    <intent-filter>
+                        <action android:name="android.intent.action.VIEW" />
+                        <category android:name="android.intent.category.BROWSABLE" />
+                        <category android:name="android.intent.category.DEFAULT" />
+                    </intent-filter>
+                </activity>
+
+                <!-- required for billing ANE -->
+                <activity
+                    android:name="com.android.billingclient.api.ProxyBillingActivity"
+                    android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+                    android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+
             </application>
             </manifest>]]></manifestAdditions>
     </android>
@@ -53,8 +56,8 @@
                 
                 <key>UIDeviceFamily</key>
                 <array>
-                    <string>1</string>
-                    <string>2</string>
+                <string>1</string>
+                <string>2</string>
                 </array>]]>
             
         </InfoAdditions>

@@ -1,5 +1,153 @@
 In App Payments Adobe Air Native Extension
 
+*Apr 5, 2019 - V3.0.0*
+* Rebuilt the Android side with the [new billing library V1.2.2](https://developer.android.com/google/play/billing/billing_overview) provided with Google.
+* Google has decided to [remove the **developerPlayload**](https://issuetracker.google.com/issues/63381481) option so we removed it from the ANE also. 
+* Removed the whole ```com.doitflash.inAppBilling.utils.MyPurchase``` activity and added the following to the manifest instead of it.
+
+```xml
+<activity
+	android:name="com.android.billingclient.api.ProxyBillingActivity"
+	android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+	android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+```
+* **Billing.IS_DEBUG_MODE** is removed.
+* providing the Android Public key is no longer mandatory. in previous versions you had to pass the publickey when initializing the ANE but it's no longer necessary. The public key is only needed in your app if you wish to verify Android purchases in your app. if so, you should set it through **Billing.publicKey** and then use the **Billing.verifyAndroidPurchaseLocally(purchases)** method. However, verifying a purchase in your app is not recommended. You should consider verifying them on your server. For more information, read [Google docs](https://developer.android.com/google/play/billing/billing_library_overview#Verify-purchase).
+
+```actionscript
+Billing.publicKey = "Base64-encoded RSA public key found in your GooglePlay console > Development Tools > Services and APIs";
+var result:Boolean = Billing.verifyAndroidPurchaseLocally($purchases);
+```
+
+* When initializing the ANE, you must put the subscriptions in a seperate Array. If you don't support subscriptions, you can simply pass null. The initialization of the ANE has been changed like below:
+
+```actionScript
+Billing.init(
+	[	// Android in-app product IDs which you have already set in your Google Play console.
+		"productId01",
+		"productId02",
+		"productId03"
+	],
+	[ 	// Android subscription IDs which you have already set in your Google Play console.
+		"subsProductId01",
+		"subsProductId02"
+	],
+	[	// iOS in-app product IDs which you have already set in your iTunes Connect.
+		"consumable_productId01",
+		"managed_productId02",
+		"managed_productId03",
+		"promoConsumable1"
+	],
+	[ // iOS subscription IDs which you have already set in your iTunes Connect.
+		"auto_renewable_01"
+	],
+	onInitResult);
+
+function onInitResult($status:int, $msg:String):void
+{
+	trace("init was successful: " + Boolean($status));
+	trace("init msg = " + $msg);
+}
+```
+
+* promo purchases are now supported on Android too. To make sure you are always checking for possible purchases being happen in GooglePlay app, you must call **Billing.getPurchases** whenever your app is resumed:
+
+```actionscript
+NativeApplication.nativeApplication.addEventListener(Event.ACTIVATE, handleActivate);
+
+function handleActivate(e:Event):void
+{
+	/*
+		On Android, purchases will be read from GooglePlay app and it is recommended
+		to always check it when app is activated. This way, if the user has redeemed
+		a promotion code, your app will know about it.
+		
+		To know about promo-purchases on iOS, you must listen to the event
+		BillingEvent.PROMO_PURCHASE_SUCCESS
+	*/
+
+	if(OverrideAir.os == OverrideAir.ANDROID && Billing.isInitialized)
+		Billing.getPurchases(onGetPurchasesResult);
+}
+```
+
+* The property **developerPayload** is removed from class Purchase. This is [Google's decision](https://issuetracker.google.com/issues/63381481). On the iOS side, we never had developerPayload but we had to do some tricks in ANE to make it happen. Now that Android also decided to remove it like iOS, we also removed it from both sides.
+* **Billing.products** returns ```Vector.<Product>``` instead of an Array.
+* The callback function for method **Billing.getPurchases** returns ```Vector.<Purchase>``` instead of an Array.
+
+```actionscript
+function($purchases:Vector.<Purchase>):void
+{
+	//$purchases: If null, it means there's been a problem in retriving the list of purchases from server.
+	// if not null, but $purchases.length is 0, it means that there are no purchase records for this user on server
+}
+```
+
+* The callback function for method **Billing.doPayment** now has a new parameter ```$wasConsumed:Boolean```.
+
+```actionscript
+function onPurchaseResult($status:int, $purchase:Purchase, $msg:String, $wasConsumed:Boolean):void
+{
+	//$status: if 1, it means that the purchase has been made successfully. 0 if otherwise.
+	//$purchase: will be non-null if the purchase was successful.
+	//$msg: a string representing the purchase result.
+	//$wasConsumed: true if the purchase has been consumed already. This is meaningless when dealing with subscriptions
+
+	/*
+	IMPORTANT:
+	Unlike iOS which you could create consumable products inside iTunesConnect, in Android you
+	can only create managed products. This means that native devs will always need to manually consume
+	their products. To make your job easier and make sure the Android and iOS sides work similar to each
+	other on this ANE, we are consuming the purchases on Android automatically (if you have set
+	BillingType.CONSUMABLE in the doPayment method).
+	
+	However, it is possible, that due to internet connection or any other reason, the process fails. So
+	your Android consumable item will be purchased but not consumed! When this happens, you must
+	forceConsume the item yourself. To know if this problem has happened, all you have to do is to
+	check if the $wasConsumed param is true or not. and if it's false, call forceConsume on it.
+	
+	This problem might happen on Android side only. on iOS, it will be fine because the product is marked
+	consumable by iTunesConnect and will be consumed without ANE's help.
+}
+```
+
+* When starting a new payment flow, instead of passing the developerPayload, you have the option to pass **AccountId** or pass null.
+
+```actionscript
+Billing.doPayment(
+	BillingType.CONSUMABLE,
+	"productId01",
+	null,
+	onPurchaseResult);
+
+/*
+	Specify an optional obfuscated string that is uniquely associated with the user's account in your app. 
+	
+	If you pass this value, Google/Apple can use it to detect irregular activity, such as many
+ 	devices making purchases on the same account in a short period of time. Do not use the developer ID or the
+ 	user's Google ID for this field. In addition, this field should not contain the user's ID in cleartext.
+
+ 	We recommend that you use a one-way hash to generate a string from the user's ID and store the hashed string in
+ 	this field.
+*/
+```
+
+* The ```Billing.forceConsume``` method works with **purchaseToken** from now on instead of passing the productId. When a purchase happens or when you call **Billing.getPurchases** to retrive old purchases, Every purchase has a String purchaseToken property. you must pass this string to the Billing.forceConsume method.
+
+```actionscript
+Billing.forceConsume(purchase.purchaseToken, onForceConsumeResult);
+```
+
+* Added new method [Billing.redeem()](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/Billing.html#redeem())
+* Added new method [Billing.replaceSubscription()](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/Billing.html#replaceSubscription())
+* Added new method [Billing.isFeatureSupported()](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/Billing.html#isFeatureSupported())
+* Added new method [Billing.priceChangeConfirmation()](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/Billing.html#priceChangeConfirmation())
+* Added new method [Billing.verifyAndroidPurchaseLocally()](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/Billing.html#verifyAndroidPurchaseLocally())
+* Added new property [Billing.CHILD_DIRECTED](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/Billing.html#CHILD_DIRECTED)
+* Added new property [Billing.UNDER_AGE_OF_CONSENT](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/Billing.html#UNDER_AGE_OF_CONSENT)
+* Added new property [Billing.isInitialized](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/Billing.html#isInitialized)
+* The method ```Billing.clearCache``` is deprecated and will be removed in future versions. The ANE will now clear the cache whenever is necessary so you don't have to do it manually.
+
 *Nov 18, 2018 - V2.5.4*
 * Works with OverrideAir ANE V5.6.1 or higher
 * Works with ANELAB V1.1.26 or higher
