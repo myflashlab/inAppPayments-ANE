@@ -1,18 +1,24 @@
 # Identical in-app-payments ANE for Android+iOS
-In-app-payments ANE is the first Adobe AIR Native Extension which has made sure the Android and iOS in-app-billing work flows are identical so AIR developers won't be confused at all. While making these two completely different APIs are identical, we made sure that you will have access to all their features so you are not missing anything important.
+In-app-payments ANE is the first Adobe AIR Native Extension which has made sure the Android and iOS in-app-billing work flows are identical so AIR developers won't be confused. While making these two completely different APIs identical, we made sure that you will have access to all their features so you are not missing anything.
 
 You will be able to manage your in-app payments in the most efficient way with an identical AS3 API.
 
 **Main Features:**
 * Verifies the list of product IDs availability on Google and Apple servers.
-* Gets the list of users' previous purchases. (they call it 'restoring' purchases in iOS)
+* Gets the list of users' previous purchases. (Known as 'restoring' purchases in iOS)
 * Supports consumable, permanent and subscription payment types.
-* Returns purchase information + developer-specified string uppon a successful purchase process.
 * Returns purchase signature on Android and you have access to purchase receipts on iOS.
 * Supports iOS 11+ [in-app-purchase promotion feature](https://developer.apple.com/app-store/promoting-in-app-purchases/).
 * iOS ParentalGate notifier.
+* Supports Android promo-purchases.
 
-[find the latest **asdoc** for this ANE here.](http://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/package-detail.html)
+[find the latest **asdoc** for this ANE here.](https://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/package-detail.html)
+
+# How to test purchases in your app
+
+On Android, you must create test users in your Google Play console and when running the app in your device, you must make sure that the test user introduced in your Google Play console is logged in on the device. In this case, all the payments will happen without real money.
+
+On iOS, you must create sandbox test users from your iTunesConnect panel and when testing the app, you must login with that test account appleID. However, you should notice that permenant products on iOS, when purchased, cannot be consumed so if you want to test them again, you must create new sandbox/test users.
 
 # AIR Usage
 For the complete AS3 code usage, see the [demo project here](https://github.com/myflashlab/inAppPayments-ANE/blob/master/AIR/src/Main.as).
@@ -24,11 +30,7 @@ import com.myflashlab.air.extensions.billing.*;
 // Play and iTunes Connect consoles. there are a lot of tutorials on the web talking about 
 // how you can setup your consoles with the product IDs and using this extension makes no 
 // different on that part. So, after you finished setting up your console, here's how you do 
-// the coding part.
-
-// omit this line or set to false when you're ready to make a release version of your app. 
-// [When developing, make sure you are setting this to true]
-Billing.IS_DEBUG_MODE = true;
+// the coding part in AIR.
 
 /*
 	IMPORTANT: you must initialize this ANE as soon as possible in your app.
@@ -38,7 +40,12 @@ Billing.IS_DEBUG_MODE = true;
 
 // initialize the extension by passing in the product IDs and finally a callback function so 
 // you will know when the initialization process finishes.
-Billing.init("Android KEY from Google Play Console", [Array of Android products], [Array of iOS products], onInitResult);
+Billing.init(
+	[Array of Android in-app product IDs], // or pass null if you don't use these
+	[Array of Android subscription IDs], // or pass null if you don't use these
+	[Array of iOS in-app product IDs], // or pass null if you don't use these
+	[Array of iOS subscription IDs], // or pass null if you don't use these
+	onInitResult);
 
 private function onInitResult($status:int, $msg:String):void
 {
@@ -55,70 +62,51 @@ private function onInitResult($status:int, $msg:String):void
 	else
 	{
 		// Here's the list of available/online products which you can make purchases on them:
-		var availableProducts:Array = Billing.products;
-		var currProduct:Product;
-		for (var i:int = 0; i < availableProducts.length; i++) 
+		for (var i:int = 0; i < Billing.products.length; i++)
 		{
-			currProduct = availableProducts[i];
-			trace("\t productId = " + 	currProduct.productId);
-			trace("\t title = " + 		currProduct.title);
-			trace("\t description = " + currProduct.description);
-			trace("\t price = " + 		currProduct.price);
-			trace("\t currency = " + 	currProduct.currency);
-			trace("---------------------------------------");
+			trace("\t productId = " + 	Billing.products[i].productId);
+			trace("\t title = " + 		Billing.products[i].title);
+			trace("\t description = " + Billing.products[i].description);
+			trace("\t price = " + 		Billing.products[i].price);
+			trace("\t currency = " + 	Billing.products[i].currency);
 		}
 	}
 		
 	/*
 		only when the ANE is initialized, you must call other methods.
-		the main 3 methods of this API are: getPurchases, doPayment and clearCache
+		the main methods of this ANE are: getPurchases, doPayment
 	*/
 	
-	// so, we use getPurchases to connect to Google or Apple servers and restore the 
-	// list of all previously purchased products. Please note that consumable products 
+	// Use getPurchases to connect to Google/Apple servers and restore the 
+	// list of previously purchased products. Notice that consumable products 
 	// are never saved so you should not expect to receive them with this method.
 	Billing.getPurchases(onGetPurchasesResult);
 	
-	// To be able to make the Android and iOS APIs identical to the Air side and also 
-	// to improve the extension performance and making it super dev-friendly, we decided 
-	// to cache the purchase information. Considering this fact, you may need to clear the 
-	// local cache from time to time, for example when a user logouts from your app. Make 
-	// sure to read the asdoc to know more about this method and when is the best case 
-	// senarios for clearing the cache.
-	Billing.clearCache();
-	
-	// To make a payment, you can use the doPayment method and pass in the type of payment, 
-	// the productID and an optional Payload message and finally the callback function to get 
+	// To start a payment flow, use the doPayment method and pass in the type of payment, 
+	// the productID and an optional String as accountID and finally the callback function to get 
 	// the result of the payment.
-	Billing.doPayment(BillingType.CONSUMABLE, "android.test.purchased", "Payload CONSUMABLE", onPurchaseResult);
+	Billing.doPayment(BillingType.CONSUMABLE, "productId", null, onPurchaseResult);
 }
 
-private function onGetPurchasesResult($purchases:Array):void
+private function onGetPurchasesResult($purchases:Vector.<Purchase>):void
 {
 	if ($purchases) // means we have successfully connected the server.
 	{
 		if ($purchases.length > 0)
 		{
-			var purchaseData:Purchase;
-			var lng:int = $purchases.length;
-			var i:int;
-			
-			for (i = 0; i < lng; i++)
+			for (var i:int = 0; i < $purchases.length; i++)
 			{
-				purchaseData = $purchases[i];
-				trace("----------------");
-				trace("purchaseData.orderId = " + 		purchaseData.orderId);
-				trace("purchaseData.productId = " +		purchaseData.productId);
-				trace("purchaseData.purchaseState = " +		purchaseData.purchaseState);
-				trace("purchaseData.purchaseTime = " +		purchaseData.purchaseTime);
-				trace("purchaseData.purchaseToken = " +		purchaseData.purchaseToken);
+				trace("purchaseData.orderId = " +			$purchases[i].orderId);
+				trace("purchaseData.productId = " +			$purchases[i].productId);
+				trace("purchaseData.purchaseState = " +		$purchases[i].purchaseState);
+				trace("purchaseData.purchaseTime = " +		$purchases[i].purchaseTime);
+				trace("purchaseData.purchaseToken = " +		$purchases[i].purchaseToken);
 
 				if(Billing.os == Billing.ANDROID)
 				{
-					trace("purchaseData.autoRenewing = " +		purchaseData.autoRenewing);
-					trace("purchaseData.signature = " +		purchaseData.signature);
+					trace("purchaseData.autoRenewing = " +	$purchases[i].autoRenewing);
+					trace("purchaseData.signature = " +		$purchases[i].signature);
 				}
-				trace("----------------");
 			}
 		}
 		else // if it's an empty Array, it means there are no purchase records for this user on the server.
@@ -132,17 +120,11 @@ private function onGetPurchasesResult($purchases:Array):void
 	}
 }
 
-private function onPurchaseResult($status:int, $data:Purchase, $msg:String):void
+private function onPurchaseResult($status:int, $purchase:Purchase, $msg:String, $wasConsumed:Boolean):void
 {
 	trace("\n purchase was successful? " + Boolean($status));
 	
-	if ($msg == Billing.ALREADY_OWNED_ITEM)
-	{
-		trace($msg);
-
-		// on Android, you can consume items which are owned already using the Billing.forceConsume method
-	}
-	else if ($msg == Billing.NOT_FOUND_ITEM)
+	if ($msg == Billing.ALREADY_OWNED_ITEM || $msg == Billing.NOT_FOUND_ITEM)
 	{
 		trace($msg);
 	}
@@ -151,35 +133,48 @@ private function onPurchaseResult($status:int, $data:Purchase, $msg:String):void
 		trace("purchase result message = " + $msg);
 	}
 	
-	if ($data)
+	if ($purchase)
 	{
-		trace("----------------");
-		trace("$data.billingType = " + 			$data.billingType);
-		trace("$data.orderId = " + 			$data.orderId);
-		trace("$data.developerPayload = " + 		$data.developerPayload);
-		trace("$data.productId = " +			$data.productId);
-		trace("$data.purchaseState = " +		$data.purchaseState);
-		trace("$data.purchaseTime = " +			$data.purchaseTime);
-		trace("$data.purchaseToken = " +		$data.purchaseToken);
-
-		if(Billing.os == Billing.ANDROID)
+		if($purchase.billingType == BillingType.CONSUMABLE)
 		{
-			trace("$data.autoRenewing = " +		$data.autoRenewing);
-			trace("$data.signature = " +		$data.signature);
+			trace("purchase was consumed? " + $wasConsumed);
+			
+			if(!$wasConsumed)
+			{
+				trace("There's been a problem in consuming this Android product. mark it and consume it manually now...");
+				Billing.forceConsume($purchase.purchaseToken, onForceConsumeResult);
+			}
 		}
-		trace("----------------");
+
+		trace("$purchase.billingType = " +			$purchase.billingType);
+		trace("$purchase.orderId = " +				$purchase.orderId);
+		trace("$purchase.productId = " +			$purchase.productId);
+		trace("$purchase.purchaseState = " +		$purchase.purchaseState);
+		trace("$purchase.purchaseTime = " +			$purchase.purchaseTime);
+		trace("$purchase.purchaseToken = " +		$purchase.purchaseToken);
+		
+		if(OverrideAir.os == OverrideAir.ANDROID)
+		{
+			trace("$purchase.autoRenewing = " +		$purchase.autoRenewing);
+			trace("$purchase.signature = " +		$purchase.signature);
+
+			// it is recommended to verify purchases on your server. but yet, you can do it on the app also.
+			// before calling this method however, you should have set the Billing.publicKey property
+			trace("verifyAndroidPurchaseLocally: "+ Billing.verifyAndroidPurchaseLocally($purchase));
+		}
 	}
 }
 ```
 # AIR Usage - Consume a purchase on Android
 ```actionscript
-Billing.forceConsume("android.test.purchased", onForceConsumeResult);
+// when a purchase is successful, you will have access to $purchase.purchaseToken. you should use this
+// string to force consume a purchase on Android. in iOS, you cannot consume purchases manually!
+Billing.forceConsume("purchaseToken String", onForceConsumeResult);
 function onForceConsumeResult($result:Boolean):void
 {
 	if($result)
 	{
 		trace("your purchase has been consumed successfully");
-		Billing.clearCache();
 	}
 	else
 	{
@@ -207,23 +202,13 @@ function onIosPromoPurchaseSuccess(e:BillingEvent):void
 	
 	if (e.purchase)
 	{
-		trace("----------------");
 		// we cannot determine the "billingType" on promo purchases!
 		// It's your job to name your productId in a way so you will know this.
 		trace("$data.orderId = " + 		e.purchase.orderId);
-		trace("$data.developerPayload = " + 	e.purchase.developerPayload); // is always empty on promo purchases
 		trace("$data.productId = " +		e.purchase.productId);
 		trace("$data.purchaseState = " +	e.purchase.purchaseState);
 		trace("$data.purchaseTime = " +		e.purchase.purchaseTime);
 		trace("$data.purchaseToken = " +	e.purchase.purchaseToken);
-		trace("----------------");
-		
-		// If your promo purchase is not a consumable one, you surely expect to see it when
-		// Billing.getPurchases(onGetPurchasesResult); is called, right?
-		// to make sure you are seeing it, always clear cache when PROMO_PURCHASE_SUCCESS happens.
-		
-		// When you clear the cache, the ANE will try to get the purchase results fresh from app store.
-		Billing.clearCache();
 	}
 }
 ```
@@ -235,6 +220,28 @@ itms-services://?action=purchaseIntent&bundleId=com.example.app&productIdentifie
 replace com.example.app with your own app package name / bundle ID
 replace yourProductId with your own product ID which you wish to promote
 ```
+
+# Promo purcases on Android
+You can [create promotional codes](https://support.google.com/googleplay/android-developer/answer/6321495?hl=en&ref_topic=7071529) and send them out to your users. Users can redeem these codes inside GooglePlay app or you can take users there by calling ```Billing.redeem()``` method. When users submit the code, they will be returned to your app. In your app, you must always check ```Billing.getPurchases``` when the app resumes so you would know if a promo-purchase has happened or not.
+
+```actionscript
+NativeApplication.nativeApplication.addEventListener(Event.ACTIVATE, handleActivate);
+
+private function handleActivate(e:Event):void
+{
+	/*
+		On Android, purchases will be read from GooglePlay app and it is recommended
+		to always check it when app is activated. This way, if the user has redeemed
+		a promotion code, your app will know about it.
+		
+		To know about promo-purchases on iOS, you must listen to the event
+		BillingEvent.PROMO_PURCHASE_SUCCESS
+	*/
+	if(OverrideAir.os == OverrideAir.ANDROID && Billing.isInitialized)
+		Billing.getPurchases(onGetPurchasesResult);
+}
+```
+
 # Air .xml manifest
 ```xml
 <!--
@@ -250,7 +257,10 @@ FOR ANDROID:
 	<application android:hardwareAccelerated="true" android:allowBackup="true">
 		
 		<!-- required for billing dialog -->
-		<activity android:name="com.doitflash.inAppBilling.utils.MyPurchase" android:theme="@style/Theme.Transparent" />
+		<activity
+			android:name="com.android.billingclient.api.ProxyBillingActivity"
+			android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+			android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 		
 	</application>
 </manifest>
@@ -280,7 +290,7 @@ Embedding the ANE:
 ```
 
 # Requirements 
-* Android API 15+
+* Android API 19+
 * iOS SDK 9.0+
 * AIR SDK 30+
 
