@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <application xmlns="http://ns.adobe.com/air/application/32.0">
     <id>com.doitflash.inAppBilling2</id>
-    <versionNumber>3.0.0</versionNumber>
+    <versionNumber>3.0.11</versionNumber>
     <supportedProfiles>mobileDevice</supportedProfiles>
     <filename>exBilling</filename>
     <name>In App Payments</name>
@@ -11,7 +11,7 @@
             <uses-permission android:name="android.permission.INTERNET" />
             <uses-permission android:name="android.permission.WAKE_LOCK" />
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-            <uses-sdk android:targetSdkVersion="26"/>
+            <uses-sdk android:targetSdkVersion="28"/>
             
             <!-- required for billing ANE -->
             <uses-permission android:name="com.android.vending.BILLING" />
@@ -43,7 +43,7 @@
         <InfoAdditions>
             
             <![CDATA[<key>MinimumOSVersion</key>
-                <string>9.0</string>
+                <string>10.0</string>
                 
                 <key>UIStatusBarStyle</key>
                 <string>UIStatusBarStyleBlackOpaque</string>
@@ -56,8 +56,8 @@
                 
                 <key>UIDeviceFamily</key>
                 <array>
-                <string>1</string>
-                <string>2</string>
+                    <string>1</string>
+                    <string>2</string>
                 </array>]]>
             
         </InfoAdditions>

@@ -1,5 +1,10 @@
 In App Payments Adobe Air Native Extension
 
+*Aug 4, 2019 - V3.0.11*
+* Added support for Android 64-bit arch.
+* Supports iOS 10+
+* Added ```originalOrderId``` property to the Purchase class. useful when restoring purchases on the iOS side.
+
 *Apr 5, 2019 - V3.0.0*
 * Rebuilt the Android side with the [new billing library V1.2.2](https://developer.android.com/google/play/billing/billing_overview) provided with Google.
 * Google has decided to [remove the **developerPlayload**](https://issuetracker.google.com/issues/63381481) option so we removed it from the ANE also. 
