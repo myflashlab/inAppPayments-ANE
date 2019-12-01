@@ -1,5 +1,15 @@
 In App Payments Adobe Air Native Extension
 
+*Dec 1, 2019 - V4.0.0*
+* Updated the latest Android billing library V2.0.3
+* The ```rawData``` property in **Purchase** class is now public and accessible.
+* Introduced a new property called ```isAcknowledged``` to the **Purchase** class.
+* Introduced new method, ```Billing.acknowledgePurchase()```.
+* **NOTICE:** On Android, whenever a purchase is made, you must acknowledge it. Failure to acknowledge a purchase will result in that purchase being refunded.
+  * For ```BillingType.CONSUMABLE```, ANE will automatically uses the new Android method to acknowledge the purchase.
+  * For ```BillingType.PERMANENT``` and ```BillingType.AUTO_RENEWAL```, you must call the ```Billing.acknowledgePurchase()``` method after the purchase result is returned.
+
+
 *Aug 4, 2019 - V3.0.11*
 * Added support for Android 64-bit arch.
 * Supports iOS 10+

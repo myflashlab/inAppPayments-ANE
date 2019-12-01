@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <application xmlns="http://ns.adobe.com/air/application/32.0">
     <id>com.doitflash.inAppBilling2</id>
-    <versionNumber>3.0.11</versionNumber>
+    <versionNumber>4.0.0</versionNumber>
     <supportedProfiles>mobileDevice</supportedProfiles>
     <filename>exBilling</filename>
     <name>In App Payments</name>

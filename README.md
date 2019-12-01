@@ -11,6 +11,7 @@ You will be able to manage your in-app payments in the most efficient way with a
 * Supports iOS 11+ [in-app-purchase promotion feature](https://developer.apple.com/app-store/promoting-in-app-purchases/).
 * iOS ParentalGate notifier.
 * Supports Android promo-purchases.
+* Supports Android purchase acknowledgement.
 
 [find the latest **asdoc** for this ANE here.](https://myflashlab.github.io/asdoc/com/myflashlab/air/extensions/billing/package-detail.html)
 
@@ -104,8 +105,10 @@ private function onGetPurchasesResult($purchases:Vector.<Purchase>):void
 
 				if(Billing.os == Billing.ANDROID)
 				{
-					trace("purchaseData.autoRenewing = " +	$purchases[i].autoRenewing);
-					trace("purchaseData.signature = " +		$purchases[i].signature);
+					trace("purchaseData.autoRenewing = " +	 $purchases[i].autoRenewing);
+					trace("purchaseData.signature = " +		 $purchases[i].signature);
+					trace("purchaseData.isAcknowledged = " + $purchases[i].isAcknowledged);
+					trace("verifyAndroidPurchaseLocally: " + Billing.verifyAndroidPurchaseLocally($purchases[i]));
 				}
 			}
 		}
@@ -157,6 +160,8 @@ private function onPurchaseResult($status:int, $purchase:Purchase, $msg:String, 
 		{
 			trace("$purchase.autoRenewing = " +		$purchase.autoRenewing);
 			trace("$purchase.signature = " +		$purchase.signature);
+			trace("$purchase.isAcknowledged = " +	$purchase.isAcknowledged);
+			trace("$purchase.rawData = " +			$purchase.rawData);
 
 			// it is recommended to verify purchases on your server. but yet, you can do it on the app also.
 			// before calling this method however, you should have set the Billing.publicKey property
@@ -182,6 +187,21 @@ function onForceConsumeResult($result:Boolean):void
 	}
 }
 ```
+# AIR Usage - Acknowledge a purchase on Android
+```actionscript
+// On Android, you must always acknowledge a purchase when results are returned.
+// A successfull purchase will return the purchase token, you must pass it to the
+// acknowledgePurchase method.
+// consumable purchases are automatically acknowledged by the ANE but for Permenant 
+// and autoRenewal purchases, you must use the acknowledgePurchase method.
+
+Billing.acknowledgePurchase(purchaseToken, function ($error:String):void
+{
+	if($error) trace($error);
+	else trace("onAcknowledgePurchase success");
+});
+```
+
 # AIR Usage - iOS 11+ promotional purchases
 **IMPORTANT:** to use this feature, the ANE MUST be initialized the soonest possible in your app. the best place for that is the Constructor function of your project's Document Class.
 ```actionscript

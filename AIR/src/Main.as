@@ -217,10 +217,11 @@ import flash.utils.setTimeout;
 				// we cannot determine the "billingType" on promo purchases!
 				// It's your job to name your productId in a way so you will know this.
 				C.log("$data.orderId = " + 				e.purchase.orderId);
-				C.log("$data.productId = " +			e.purchase.productId);
-				C.log("$data.purchaseState = " +		e.purchase.purchaseState);
+				C.log("$data.originalOrderId = " + 		e.purchase.originalOrderId);
+				C.log("$data.productId = " +				e.purchase.productId);
+				C.log("$data.purchaseState = " +			e.purchase.purchaseState);
 				C.log("$data.purchaseTime = " +			e.purchase.purchaseTime);
-				C.log("$data.purchaseToken = " +		e.purchase.purchaseToken);
+				C.log("$data.purchaseToken = " +			e.purchase.purchaseToken);
 				C.log("----------------");
 			}
 		}
@@ -412,6 +413,29 @@ import flash.utils.setTimeout;
 			
 			//----------------------------------------------------------------------
 			
+			var btn004:MySprite = createBtn("acknowledge purchase!");
+			btn004.addEventListener(MouseEvent.CLICK, acknowledgePurchase);
+			if(OverrideAir.os == OverrideAir.ANDROID) _list.add(btn004);
+			
+			function acknowledgePurchase(e:MouseEvent):void
+			{
+				Billing.acknowledgePurchase(_tokens[0], onAcknowledgePurchaseResult);
+			}
+			
+			function onAcknowledgePurchaseResult($error:String):void
+			{
+				if($error)
+				{
+					C.log($error);
+				}
+				else
+				{
+					C.log("onAcknowledgePurchase success");
+				}
+			}
+			
+			//----------------------------------------------------------------------
+			
 			var btn4:MySprite = createBtn("purchase Subscription!");
 			btn4.addEventListener(MouseEvent.CLICK, purchaseSubscription);
 			_list.add(btn4);
@@ -442,6 +466,7 @@ import flash.utils.setTimeout;
 			var btn7:MySprite = createBtn("Redeem");
 			btn7.addEventListener(MouseEvent.CLICK, redeem);
 			if(OverrideAir.os == OverrideAir.ANDROID) _list.add(btn7);
+			
 			
 			function redeem(e:MouseEvent):void
 			{
@@ -476,6 +501,7 @@ import flash.utils.setTimeout;
 					{
 						C.log("----------------");
 						C.log("purchaseData.orderId = " + 			$purchases[i].orderId);
+						C.log("purchaseData.originalOrderId = " + 	$purchases[i].originalOrderId);
 						C.log("purchaseData.productId = " +			$purchases[i].productId);
 						C.log("purchaseData.purchaseState = " +		$purchases[i].purchaseState);
 						C.log("purchaseData.purchaseTime = " +		$purchases[i].purchaseTime);
@@ -487,6 +513,7 @@ import flash.utils.setTimeout;
 						{
 							C.log("purchaseData.autoRenewing = " +		$purchases[i].autoRenewing);
 							C.log("purchaseData.signature = " +			$purchases[i].signature);
+							C.log("purchaseData.isAcknowledged = " +		$purchases[i].isAcknowledged);
 							trace("verifyAndroidPurchaseLocally: " + Billing.verifyAndroidPurchaseLocally($purchases[i]));
 						}
 						C.log("----------------");
@@ -552,6 +579,7 @@ import flash.utils.setTimeout;
 				C.log("----------------");
 				C.log("$purchase.billingType = " +			$purchase.billingType);
 				C.log("$purchase.orderId = " +				$purchase.orderId);
+				C.log("$purchase.originalOrderId = " +		$purchase.originalOrderId);
 				C.log("$purchase.productId = " +				$purchase.productId);
 				C.log("$purchase.purchaseState = " +			$purchase.purchaseState);
 				C.log("$purchase.purchaseTime = " +			$purchase.purchaseTime);
@@ -561,6 +589,8 @@ import flash.utils.setTimeout;
 				{
 					C.log("$purchase.autoRenewing = " +		$purchase.autoRenewing);
 					C.log("$purchase.signature = " +			$purchase.signature);
+					C.log("$purchase.isAcknowledged = " +		$purchase.isAcknowledged);
+					C.log("$purchase.rawData = " +			$purchase.rawData);
 					trace("verifyAndroidPurchaseLocally: "+ Billing.verifyAndroidPurchaseLocally($purchase));
 				}
 				C.log("----------------");
