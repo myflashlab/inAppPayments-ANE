@@ -1,4 +1,8 @@
-In App Payments Adobe Air Native Extension
+# In App Payments Adobe Air Native Extension
+
+*Jul 27, 2020 - v4.9.0*
+- Updated to the latest Android billing library v2.2.1.
+- Fixed some minor issues and preparing for update functionalities.
 
 *Dec 1, 2019 - V4.0.0*
 * Updated the latest Android billing library V2.0.3
